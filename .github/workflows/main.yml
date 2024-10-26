@@ -20,7 +20,7 @@ jobs:
       - run: flutter pub get
           
       - name: Build Web 🧱🌐
-        run: flutter build web --base-href "/ati/"
+        run: flutter build web
         
       - name: Deploy Web 🚀🌐
         uses: JamesIves/github-pages-deploy-action@v4
