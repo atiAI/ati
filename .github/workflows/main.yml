@@ -1,0 +1,29 @@
+name: Flutter CI
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - master
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v1
+      - uses: actions/setup-java@v1
+        with:
+          java-version: '12.x'
+      - uses: subosito/flutter-action@v1
+        with:
+          channel: 'beta'
+      - run: flutter pub get
+          
+      - name: Build Web 🧱🌐
+        run: flutter build web --base-href "/ati/"
+        
+      - name: Deploy Web 🚀🌐
+        uses: JamesIves/github-pages-deploy-action@v4
+        with:
+          folder: build/web
+      
