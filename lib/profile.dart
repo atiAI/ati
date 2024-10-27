@@ -23,7 +23,6 @@ class _UserProfileState extends State<UserProfile> {
   Widget build(BuildContext context) {
     return Scaffold(
 			appBar: AppBar(title: const Text("Profil Ayarları")),
-		
 			body: Center(
 			child: Container(
 			constraints: const BoxConstraints(maxWidth: 600),
@@ -31,12 +30,14 @@ class _UserProfileState extends State<UserProfile> {
 				Center(child: Stack(children: [
 					Padding(
 					padding: const EdgeInsets.only(top: 32),
-					child: ClipRRect( borderRadius: BorderRadius.circular(10000),
-						child: Image.asset(
-							getProfilePic(),
-							height: min(MediaQuery.sizeOf(context).width * 0.4, 256),
-						),
-					))
+						child: ClipRRect(
+							borderRadius: BorderRadius.circular(10000),
+							child: Image.asset(
+								getProfilePic(),
+								height: min(MediaQuery.sizeOf(context).width * 0.4, 256),
+							),
+						)
+					)
 				],)),
 				const SizedBox(height: 12),
 				Center(child: Row(

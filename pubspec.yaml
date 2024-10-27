@@ -38,6 +38,8 @@ dependencies:
   shared_preferences: ^2.3.2
   chat_bubbles: ^1.6.0
   toastification: ^2.3.0
+  google_generative_ai: ^0.4.6
+  shimmer: ^3.0.0
 
 dev_dependencies:
   flutter_test:
