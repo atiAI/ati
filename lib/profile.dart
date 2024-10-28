@@ -1,14 +1,66 @@
+import 'dart:convert';
 import 'dart:math';
 import 'package:ati/main.dart';
 import 'package:flutter/material.dart';
 import 'package:toastification/toastification.dart';
 
-String getProfilePic() {
-	return prefs.getString("profileImageAsset") ?? "assets/images/user.png";
+User user = User.empty;
+
+class User{
+	User({
+		required this.name,
+		required this.pfpAsset,
+		required this.age,
+		required this.employment
+	});
+
+	String pfpAsset;
+	String name;
+	int age;
+	Employment employment;
+
+	User.fromJson(Map<String, dynamic> json)
+		: name = json["name"] as String,
+			pfpAsset = json["pfpAsset"] as String,
+			age = json["age"] as int,
+			employment = Employment.values[json["employment"] as int];
+
+	Map<String, dynamic> toJson() => {
+		"name": name,
+		"pfpAsset": pfpAsset,
+		"age": age,
+		"employment": employment.index,
+	};
+
+	static User get empty => 
+		User(
+			name: "Empty user",
+			pfpAsset: "assets/images/user.png",
+			age: 18,
+			employment: Employment.other
+		);
+
 }
 
-String getProfileName() {
-	return prefs.getString("profileName") ?? "Username";
+enum Employment {
+	teacher,
+	student,
+	other
+}
+
+void loadUser() {
+	final userData = prefs.getString("user");
+	print(userData);
+	if (userData == null){
+		user = User.empty;
+		saveUser();
+		return;
+	}
+	user = User.fromJson(jsonDecode(userData));
+}
+
+void saveUser() {
+	prefs.setString("user", jsonEncode(user.toJson()));
 }
 
 class UserProfile extends StatefulWidget {
@@ -19,6 +71,9 @@ class UserProfile extends StatefulWidget {
 }
 
 class _UserProfileState extends State<UserProfile> {
+
+	bool editingName = false;
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -33,7 +88,7 @@ class _UserProfileState extends State<UserProfile> {
 						child: ClipRRect(
 							borderRadius: BorderRadius.circular(10000),
 							child: Image.asset(
-								getProfilePic(),
+								user.pfpAsset,
 								height: min(MediaQuery.sizeOf(context).width * 0.4, 256),
 							),
 						)
@@ -43,12 +98,33 @@ class _UserProfileState extends State<UserProfile> {
 				Center(child: Row(
 					mainAxisSize: MainAxisSize.min,
 					children: [
+						editingName ?
+						SizedBox(
+						width: 200,
+						child:TextField(
+							autofocus: true,
+							onSubmitted: (value){
+							setState((){
+								user.name = value;
+								saveUser();
+								editingName = false;
+							});
+							},
+							controller: TextEditingController(text: user.name),
+						)):
 						Text(
-							getProfileName(),
+							user.name,
 							style: Theme.of(context).textTheme.titleLarge
 						),
 						const SizedBox(width: 6),
-						const Icon(Icons.edit)
+						InkWell(
+							onTap: (){
+							setState((){
+								editingName = true;
+							});
+							},
+							child: const Icon(Icons.edit)
+						)
 					]
 				)),
 				const SizedBox(height: 16),
@@ -66,7 +142,10 @@ class _UserProfileState extends State<UserProfile> {
 								builder:(c) => const SettingsList(
 									title: Text("Gemini Ayarları"),
 									children: [
-										TextSetting(labelText: "API Anahtarı", settingsKey:"geminiKey")
+										TextSetting(
+											labelText: "API Anahtarı",
+											settingsKey:"geminiKey"
+										),
 									]
 								)
 							),
@@ -101,7 +180,7 @@ class SettingsRow extends StatelessWidget {
 		child: ClipRRect(
 			borderRadius: BorderRadius.circular(8),
 			child: Material(
-				color: Colors.blue[500],
+				color: Theme.of(context).colorScheme.primary,
 				child: InkWell(
 					onTap: onTap,
 					borderRadius: BorderRadius.circular(8),

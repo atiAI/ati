@@ -12,14 +12,14 @@ import 'package:toastification/toastification.dart';
 
 List<ChatMessage> messages = [];
 
-fetchMessages() {
+void loadMessages() {
 	final msgHistory = prefs.getStringList("msgHistory") ?? [];
 	messages = msgHistory.map<ChatMessage>(
 		(m) => ChatMessage.deserialize(m)
 	).toList();
 }
 
-saveMessages() async {
+void saveMessages() async {
 	List<String> msgHistory = [];
 	for (var msg in messages) {
 		msgHistory.add(await msg.serialize());
@@ -231,7 +231,7 @@ class _ChatPageState extends State<ChatPage> {
 
 	@override
 	void initState() {
-		fetchMessages();
+		loadMessages();
 		super.initState();
 		SchedulerBinding.instance.addPostFrameCallback((_){
 			scrollController.jumpTo(scrollController.position.maxScrollExtent);

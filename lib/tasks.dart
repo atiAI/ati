@@ -4,18 +4,17 @@ import 'dart:math';
 import 'package:ati/gemini.dart';
 import 'package:ati/main.dart';
 import 'package:flutter/material.dart';
-import 'package:toastification/toastification.dart';
 
 const kMinGorev = 1;
 const kMaxGorev = 4;
 
 List<Gorev> gorevler = [];
 
-loadTasks(){
+void loadTasks(){
 	gorevler = (jsonDecode(prefs.getString("tasks") ?? "[]") as List).map<Gorev>((el)=>Gorev.fromJson(el)).toList();
 }
 
-saveTasks(){
+void saveTasks(){
 	prefs.setString("tasks", jsonEncode(gorevler));
 }
 
@@ -167,7 +166,7 @@ class TaskCardDialog extends StatelessWidget {
 									padding: EdgeInsets.symmetric(vertical: 8),
 									child: Text("Tamamlandı")
 								),
-								icon: Icon(Icons.done)
+								icon: const Icon(Icons.done)
 							)
 						])
 					])

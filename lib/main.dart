@@ -17,8 +17,9 @@ void main() async {
 		child: MyApp()
 	));
 	prefs = await SharedPreferences.getInstance();
-	await fetchMessages();
-	await loadTasks();
+	loadMessages();
+	loadTasks();
+	loadUser();
 }
 
 class MyApp extends StatelessWidget {
@@ -96,7 +97,7 @@ class _HomeScreenState extends State<HomeScreen> {
 										MaterialPageRoute(builder: (context){return const UserProfile();})
 									);},
 									child: Image.asset(
-										"assets/images/user.png",
+										user.pfpAsset,
 										height: kToolbarHeight - 16,
 									)
 								)
