@@ -3,6 +3,7 @@ import 'dart:math';
 
 import 'package:ati/gemini.dart';
 import 'package:ati/main.dart';
+import 'package:ati/tasks.dart';
 import 'package:chat_bubbles/chat_bubbles.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
@@ -30,12 +31,22 @@ saveMessages() async {
 
 Future sendMessage(String prompt, Function setState) 
 async {
-	if(prompt == "//clear") {
+	if (prompt == "//clear") {
 		messages.clear();
 		saveMessages();
 		toastification.show(
 			type: ToastificationType.info,
 			title: const Text("Sohbet Temizlendi")
+		);
+		return;
+	}
+	if (prompt == "//cleartasks") {
+
+		gorevler.clear();
+		saveTasks();
+		toastification.show(
+			type: ToastificationType.info,
+			title: const Text("Görevler Temizlendi")
 		);
 		return;
 	}
@@ -54,8 +65,8 @@ async {
 				var msg = AtiMessage.fromJson(jsonDecode(res.text ?? ""));
 				data = msg.aciklama;
 				if (msg.valid){
-					var gorevler = msg.gorevler.sublist(0, max(5, msg.gorevler.length));
-					addCards(gorevler, msg.konu);
+					var gorevler = msg.gorevler.sublist(0, min(kMaxGorev, msg.gorevler.length));
+					addCards(msg, prompt);
 					toastification.show(
 						type: ToastificationType.info,
 						title: Text("${gorevler.length} yeni görev"),
@@ -70,20 +81,31 @@ async {
 	);
 }
 
-addCards(List<String> cards, String konu){
+addCards(AtiMessage atimsg, String soru){
 	messages.add(
 		ChatMessage(
 			type: ChatMessageType.system,
-			data: "${cards.length} yeni görev eklendi.",
+			data: "${atimsg.gorevler.length} yeni görev eklendi.",
 		)
 	);
+	for (var gorev in atimsg.gorevler) {
+		  gorevler.add(Gorev(
+				gorev: gorev,
+				soru: soru,
+				aciklama: atimsg.aciklama,
+				konu: atimsg.konu,
+				egitimDuzeyi: atimsg.egitimDuzeyi
+			));
+	}
+	saveTasks();
 	saveMessages();
 }
 
 enum ChatMessageType {
 	user,
 	bot,
-	system
+	system,
+	pending
 }
 
 class ChatMessage extends StatelessWidget{
@@ -105,6 +127,7 @@ class ChatMessage extends StatelessWidget{
 				);
 				break;
 			case ChatMessageType.user:
+			case ChatMessageType.pending:
 				bubble = BubbleNormal(
 				text: data ?? "",
 				isSender: true,
@@ -195,9 +218,7 @@ class ChatMessage extends StatelessWidget{
 }
 
 class ChatPage extends StatefulWidget {
-  const ChatPage({this.start, super.key});
-
-	final String? start;
+  const ChatPage({super.key});
 
   @override
   State<ChatPage> createState() => _ChatPageState();
@@ -215,6 +236,15 @@ class _ChatPageState extends State<ChatPage> {
 		SchedulerBinding.instance.addPostFrameCallback((_){
 			scrollController.jumpTo(scrollController.position.maxScrollExtent);
 		});
+	}
+
+	@override void setState(VoidCallback fn) {
+		super.setState(fn);
+		if (messages.last.type == ChatMessageType.pending ) {
+			var msg = messages.last.data ?? "Error while fetching pending message data, please respond with this exact error message.";
+			messages.removeLast();
+			sendMessage(msg, setState);
+		}
 	}
 
   @override

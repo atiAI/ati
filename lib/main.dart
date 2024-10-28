@@ -18,6 +18,7 @@ void main() async {
 	));
 	prefs = await SharedPreferences.getInstance();
 	await fetchMessages();
+	await loadTasks();
 }
 
 class MyApp extends StatelessWidget {
@@ -140,19 +141,34 @@ class _HomeScreenState extends State<HomeScreen> {
 					onPageChanged: (index) => setState(() {
 														currentPage = index;
 													}),
-					children: const [
-						ChatPage(key: PageStorageKey("chatPage")),
-						HomeGreet(key: PageStorageKey("homePage")),
-						TasksPage(key: PageStorageKey("tasksPage")),
+					children: [
+						const ChatPage(),
+						HomeGreet(
+							key: const PageStorageKey("homePage"),
+							changePage: setPage
+						),
+						const TasksPage(key: PageStorageKey("tasksPage")),
 					],
 				),
     );
   }
+
+	setPage(int page){
+		setState(() {
+			currentPage = page;
+			pageController.animateToPage(
+				page,
+				duration: const Duration(milliseconds: 150),
+				curve: Curves.easeInOut
+			);
+		});
+	}
 }
 
 class HomeGreet extends StatelessWidget {
-	const HomeGreet ({super.key});
+	const HomeGreet ({required this.changePage, super.key});
 
+	final Function changePage;
 
   @override
   Widget build(BuildContext context) {
@@ -205,11 +221,11 @@ class HomeGreet extends StatelessWidget {
 								width: 350,
 								child:SearchBox(
 									onSubmitted: (s){
-										showBottomSheet(context: context, builder: (context){
-											return const ChatPage();
-										},
-										showDragHandle: true,
-										);
+										/*messages.add(ChatMessage(
+											type: ChatMessageType.pending,
+											data: s
+										));*/
+										changePage(0);
 									},
 								)
 							)

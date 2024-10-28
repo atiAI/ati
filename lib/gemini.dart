@@ -1,4 +1,5 @@
 import 'package:ati/main.dart';
+import 'package:ati/tasks.dart';
 import 'package:flutter/material.dart';
 import 'package:google_generative_ai/google_generative_ai.dart';
 import 'package:toastification/toastification.dart';
@@ -53,6 +54,7 @@ class AtiGemini {
 								"Mimarlık",
 								"Tasarım",
 								"Yapay Zeka",
+								"Spor",
 								"Genel Kültür"
 							],
 						),
@@ -84,7 +86,7 @@ class AtiGemini {
 			'Milli değerlerimize ve toplumsal ahlağa uymaya özen gösterirsin.\n'
 			'- Gençlerle ile iletişim kuracağın için gerektikçe emoji kullan.\n'
 			'- Sadece eğitsel sorulara cevap ver. Sana sorulan soruların cevaplarını direkt olarak cevaplamak yerine bir öğretmen gibi konuyu açıklayarak karşındakinin konuyu kavramasına yardımcı olacaksın. Karşındakine her zaman hoş görülü ve şefkatli ol.\n'
-			'- Konuyu bir paragrafta kısaca açıkla. Konunun kavranması için en az 2 en fazla 5 görev ver. Görevler örnek soru, araştırma konusu, serbest ödev vb olabilir. Eğer bilimsel bir formül yazman gerekirse latex kullan.\n'
+			'- Konuyu bir paragrafta kısaca açıkla. Konunun kavranması için en az $kMinGorev en fazla $kMaxGorev görev ver. Görevler örnek soru, araştırma konusu, serbest ödev vb olabilir. Eğer bilimsel bir formül yazman gerekirse latex kullan.\n'
 			'- Konuyu daha çok anlamak için gerekecek Google aramasını arama\'ya yaz.\n'
 			'- Sadece valid olan soruları cevapla\n'
 			'- Eğer sana valid olmayan bir soru sorulursa, cevaplamayı kibarca reddet.\n'
@@ -132,3 +134,26 @@ class AtiMessage {
 		);
 	}
 }
+
+
+const Map<String,IconData?> atiIcons = {
+	"Matematik": Icons.functions,
+	"Fizik": Icons.rocket,
+	"Kimya": Icons.science,
+	"Biyoloji": Icons.biotech,
+	"Edebiyat": Icons.library_books,
+	"Tarih": Icons.history_edu,
+	"Coğrafya": Icons.terrain,
+	"Din": Icons.mosque,
+	"Felsefe": Icons.lightbulb,
+	"Yabancı Dil": Icons.record_voice_over,
+	"Kodlama": Icons.code,
+	"Bilgisayar": Icons.computer,
+	"Elektronik": Icons.electrical_services,
+	"Hukuk": Icons.gavel,
+	"Mimarlık": Icons.architecture,
+	"Tasarım": Icons.design_services,
+	"Yapay Zeka": Icons.auto_awesome,
+	"Spor": Icons.sports_score,
+	"Genel Kültür": Icons.school,
+};
