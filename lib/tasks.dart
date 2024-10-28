@@ -1,8 +1,10 @@
 import 'dart:convert';
+import 'dart:math';
 
 import 'package:ati/gemini.dart';
 import 'package:ati/main.dart';
 import 'package:flutter/material.dart';
+import 'package:toastification/toastification.dart';
 
 const kMinGorev = 1;
 const kMaxGorev = 4;
@@ -49,9 +51,10 @@ class Gorev {
 }
 
 class TaskCard extends StatefulWidget {
-  const TaskCard(this.gorev, {super.key});
+  const TaskCard(this.gorev, this.onComplete, {super.key});
 
 	final Gorev gorev;
+	final Function onComplete;
 
   @override
   State<TaskCard> createState() => _TaskCardState();
@@ -62,20 +65,24 @@ class _TaskCardState extends State<TaskCard> {
   Widget build(BuildContext context) {
     return Padding(
 			padding: const EdgeInsets.symmetric(
-				horizontal: 36, vertical: 14
+				horizontal: 30, vertical: 14
 			),
 			child: InkWell(
-				onTap: () => showCardDetails(context, widget.gorev),
+				onTap: () => showCardDetails(context, widget.gorev, widget.onComplete),
 				child: ClipRRect(
 					borderRadius: BorderRadius.circular(8),
 					child: Container(
 						color: Theme.of(context).colorScheme.primary,
 						child: Padding(
-							padding: const EdgeInsets.symmetric(
-								horizontal: 16, vertical: 14),
-							child: Text(
-								widget.gorev.gorev
-							)
+							padding: const EdgeInsets.only(
+								left: 16, right: 16, top: 14, bottom: 22),
+							child: Column(children:[
+								Icon(atiIcons[widget.gorev.konu]),
+								Text(
+									widget.gorev.gorev,
+									textAlign: TextAlign.center
+								),
+							])
 						)
 					)
 				)
@@ -84,30 +91,93 @@ class _TaskCardState extends State<TaskCard> {
   }
 }
 
-showCardDetails(BuildContext context, Gorev card){
-	showDialog(
+showCardDetails(BuildContext context, Gorev card, Function onComplete){
+	showGeneralDialog(
 		context: context,
-		builder: (ctx) => AlertDialog(
-			title: Center(
-				child:
-					Row(children: [
-						Text(card.konu),
-						const SizedBox(width: 8),
-						Icon(atiIcons[card.konu])
-					]
-				)
-			),
-			content: Text(card.gorev),
-			actions: [
-				ElevatedButton.icon(
-					onPressed: (){},
-					label: const Text("Tamamla", style: TextStyle(color: Colors.lightBlue),),
-					icon: const Icon(Icons.done, color: Colors.lightBlue),
-				)
-			],
-		)
+		barrierDismissible: true,
+		barrierLabel: "cardBarrier",
+		transitionBuilder: (context, a1, a2, widget){
+			return Transform.scale(
+				scale: a1.value,
+				child: widget,
+			);
+		},
+		pageBuilder: 
+			(context, anim1, anim2) => TaskCardDialog(card, onComplete)
 	);
 }
+
+class TaskCardDialog extends StatelessWidget {
+  const TaskCardDialog(this.card, this.onComplete, {super.key});
+
+	final Gorev card;
+	final Function onComplete;
+
+  @override
+  Widget build(BuildContext context) {
+    return Dialog(
+			backgroundColor: Theme.of(context).colorScheme.primary,
+			child: AspectRatio(
+				aspectRatio: 5/8,
+				child: SizedBox(
+				child: Padding(
+					padding: const EdgeInsets.symmetric(vertical: 32),
+					child: Stack(
+					children: [
+						LayoutBuilder(builder: (context, constrains)=>
+							Center(
+								child:Icon(
+									atiIcons[card.konu],
+									color: Colors.white10,
+									size: min(300, constrains.maxWidth - 50),
+								)
+							),
+						),
+						Column(children: [
+							Padding(
+								padding: const EdgeInsets.all(12),
+								child: Center(
+									child: Text(
+										card.konu,
+										style: Theme.of(context).textTheme.titleLarge
+									)
+								)
+							),
+							Expanded(
+								child: Padding(
+									padding: const EdgeInsets.symmetric(
+										vertical: 48, horizontal: 32
+									),
+									child: Center(
+										child: Text(card.gorev, textAlign: TextAlign.center,)
+									),
+								)
+							),
+							ElevatedButton.icon(
+								style: ElevatedButton.styleFrom(
+									textStyle: const TextStyle(fontSize: 18),
+									backgroundColor: Theme.of(context).colorScheme.secondary,
+									foregroundColor: Theme.of(context).colorScheme.onSecondary
+								),
+								onPressed: (){
+									onComplete();
+									Navigator.pop(context);
+								},
+								label: const Padding(
+									padding: EdgeInsets.symmetric(vertical: 8),
+									child: Text("Tamamlandı")
+								),
+								icon: Icon(Icons.done)
+							)
+						])
+					])
+				)
+				)
+			)
+		);
+  }
+}
+
 
 class TasksPage extends StatefulWidget {
   const TasksPage({super.key});
@@ -153,7 +223,13 @@ class _TasksPageState extends State<TasksPage> {
 				),*/
 				Expanded(
 					child: ListView.builder(	
-						itemBuilder: (context, index) => TaskCard(gorevler[index]),
+						itemBuilder: (context, index) => TaskCard(
+							gorevler[index], 
+							() => setState(() {
+								gorevler.removeAt(index);
+								saveTasks();
+							})
+						),
 						itemCount: gorevler.length,
 						scrollDirection: Axis.vertical,
 						/*onPageChanged: (p)=>setState((){
