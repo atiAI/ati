@@ -1,58 +1,16 @@
-import 'dart:convert';
 import 'dart:math';
 
+import 'package:ati/data.dart';
 import 'package:ati/gemini.dart';
-import 'package:ati/main.dart';
 import 'package:flutter/material.dart';
 
 const kMinGorev = 1;
 const kMaxGorev = 4;
 
-List<Gorev> gorevler = [];
-
-void loadTasks(){
-	gorevler = (jsonDecode(prefs.getString("tasks") ?? "[]") as List).map<Gorev>((el)=>Gorev.fromJson(el)).toList();
-}
-
-void saveTasks(){
-	prefs.setString("tasks", jsonEncode(gorevler));
-}
-
-class Gorev {
-	Gorev({
-		required this.gorev,
-		required this.soru,
-		required this.aciklama,
-		required this.konu,
-		required this.egitimDuzeyi,
-	});
-
-	final String gorev;
-	final String soru;
-	final String aciklama;
-	final String konu;
-	final String egitimDuzeyi;
-
-	Gorev.fromJson(Map<String, dynamic> json)
-		: gorev = json["gorev"] as String,
-		  soru = json["soru"] as String,
-		  aciklama = json["aciklama"] as String,
-		  konu = json["konu"] as String,
-		  egitimDuzeyi = json["egitimDuzeyi"] as String;
-
-	Map<String, dynamic> toJson() => {
-		"gorev": gorev,
-		"soru": soru,
-		"aciklama": aciklama,
-		"konu": konu,
-		"egitimDuzeyi": egitimDuzeyi
-	};
-}
-
 class TaskCard extends StatefulWidget {
   const TaskCard(this.gorev, this.onComplete, {super.key});
 
-	final Gorev gorev;
+	final Task gorev;
 	final Function onComplete;
 
   @override
@@ -78,7 +36,7 @@ class _TaskCardState extends State<TaskCard> {
 							child: Column(children:[
 								Icon(atiIcons[widget.gorev.konu]),
 								Text(
-									widget.gorev.gorev,
+									widget.gorev.task,
 									textAlign: TextAlign.center
 								),
 							])
@@ -90,7 +48,7 @@ class _TaskCardState extends State<TaskCard> {
   }
 }
 
-showCardDetails(BuildContext context, Gorev card, Function onComplete){
+showCardDetails(BuildContext context, Task card, Function onComplete){
 	showGeneralDialog(
 		context: context,
 		barrierDismissible: true,
@@ -109,7 +67,7 @@ showCardDetails(BuildContext context, Gorev card, Function onComplete){
 class TaskCardDialog extends StatelessWidget {
   const TaskCardDialog(this.card, this.onComplete, {super.key});
 
-	final Gorev card;
+	final Task card;
 	final Function onComplete;
 
   @override
@@ -148,7 +106,7 @@ class TaskCardDialog extends StatelessWidget {
 										vertical: 48, horizontal: 32
 									),
 									child: Center(
-										child: Text(card.gorev, textAlign: TextAlign.center,)
+										child: Text(card.task, textAlign: TextAlign.center,)
 									),
 								)
 							),
@@ -223,13 +181,14 @@ class _TasksPageState extends State<TasksPage> {
 				Expanded(
 					child: ListView.builder(	
 						itemBuilder: (context, index) => TaskCard(
-							gorevler[index], 
+							data.tasks[index], 
 							() => setState(() {
-								gorevler.removeAt(index);
-								saveTasks();
-							})
+								data.removeTask(index);
+								saveData();
+							}
+						)
 						),
-						itemCount: gorevler.length,
+						itemCount: data.tasks.length,
 						scrollDirection: Axis.vertical,
 						/*onPageChanged: (p)=>setState((){
 							currentCard = p;

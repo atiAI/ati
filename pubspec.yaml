@@ -40,6 +40,7 @@ dependencies:
   toastification: ^2.3.0
   google_generative_ai: ^0.4.6
   shimmer: ^3.0.0
+  visibility_detector: ^0.4.0+2
 
 dev_dependencies:
   flutter_test:

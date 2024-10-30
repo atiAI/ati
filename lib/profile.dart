@@ -1,67 +1,8 @@
-import 'dart:convert';
 import 'dart:math';
+import 'package:ati/data.dart';
 import 'package:ati/main.dart';
 import 'package:flutter/material.dart';
 import 'package:toastification/toastification.dart';
-
-User user = User.empty;
-
-class User{
-	User({
-		required this.name,
-		required this.pfpAsset,
-		required this.age,
-		required this.employment
-	});
-
-	String pfpAsset;
-	String name;
-	int age;
-	Employment employment;
-
-	User.fromJson(Map<String, dynamic> json)
-		: name = json["name"] as String,
-			pfpAsset = json["pfpAsset"] as String,
-			age = json["age"] as int,
-			employment = Employment.values[json["employment"] as int];
-
-	Map<String, dynamic> toJson() => {
-		"name": name,
-		"pfpAsset": pfpAsset,
-		"age": age,
-		"employment": employment.index,
-	};
-
-	static User get empty => 
-		User(
-			name: "Empty user",
-			pfpAsset: "assets/images/user.png",
-			age: 18,
-			employment: Employment.other
-		);
-
-}
-
-enum Employment {
-	teacher,
-	student,
-	other
-}
-
-void loadUser() {
-	final userData = prefs.getString("user");
-	print(userData);
-	if (userData == null){
-		user = User.empty;
-		saveUser();
-		return;
-	}
-	user = User.fromJson(jsonDecode(userData));
-}
-
-void saveUser() {
-	prefs.setString("user", jsonEncode(user.toJson()));
-}
 
 class UserProfile extends StatefulWidget {
   const UserProfile({super.key});
@@ -88,7 +29,7 @@ class _UserProfileState extends State<UserProfile> {
 						child: ClipRRect(
 							borderRadius: BorderRadius.circular(10000),
 							child: Image.asset(
-								user.pfpAsset,
+								data.user.profilePictureAsset,
 								height: min(MediaQuery.sizeOf(context).width * 0.4, 256),
 							),
 						)
@@ -105,15 +46,15 @@ class _UserProfileState extends State<UserProfile> {
 							autofocus: true,
 							onSubmitted: (value){
 							setState((){
-								user.name = value;
-								saveUser();
+								data.updateUser(name: value);
+								saveData();
 								editingName = false;
 							});
 							},
-							controller: TextEditingController(text: user.name),
+							controller: TextEditingController(text: data.user.name),
 						)):
 						Text(
-							user.name,
+							data.user.name,
 							style: Theme.of(context).textTheme.titleLarge
 						),
 						const SizedBox(width: 6),
@@ -155,7 +96,38 @@ class _UserProfileState extends State<UserProfile> {
 				),
 				SettingsRow(
 					name: "Gelişmiş Ayarlar",
-					onTap: (){},
+					onTap: (){
+						Navigator.push(
+							context,
+							MaterialPageRoute(
+								builder: (c) => SettingsList(
+									title: const Text("Gelişmiş ayarlar"),
+									children: [
+										ElevatedButton.icon(
+											style: ElevatedButton.styleFrom(
+												backgroundColor: Theme.of(context).colorScheme.primary,
+												foregroundColor: Theme.of(context).colorScheme.onPrimary
+											),
+											onPressed: (){
+												data = Data.clean();
+												saveData();
+
+												prefs.setBool("initialized", false);
+
+												Navigator.pushNamedAndRemoveUntil(
+													context,
+													"onboarding",
+													(r) => false,
+												);
+											},
+											label: const Text("Kullanıcı verisini sıfırla"),
+											icon: const Icon(Icons.delete)
+										)
+									]
+								)
+							)
+						);
+					},
 					iconData: Icons.person,
 				),
 			]),

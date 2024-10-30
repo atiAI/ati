@@ -26,7 +26,7 @@ class AtiGemini {
 				responseMimeType: 'application/json',
 				responseSchema: Schema(
 					SchemaType.object,
-					requiredProperties: ["valid", "Açıklama", "Konu", "Eğitim Düzeyi", "Görevler"],
+					requiredProperties: ["valid", "Açıklama", "Konu", "Eğitim Düzeyi", "Görevler", "Zorluk"],
 					properties: {
 						"valid": Schema(
 							SchemaType.boolean,
@@ -69,6 +69,9 @@ class AtiGemini {
 								"Genel"
 							],
 						),
+						"Zorluk": Schema(
+							SchemaType.number,
+						),
 						"Görevler": Schema(
 							SchemaType.array,
 							items: Schema(
@@ -85,54 +88,61 @@ class AtiGemini {
 			'Ati adında eğitsel bir yapay zekasın.'
 			'Milli değerlerimize ve toplumsal ahlağa uymaya özen gösterirsin.\n'
 			'- Gençlerle ile iletişim kuracağın için gerektikçe emoji kullan.\n'
-			'- Sadece eğitsel sorulara cevap ver. Sana sorulan soruların cevaplarını direkt olarak cevaplamak yerine bir öğretmen gibi konuyu açıklayarak karşındakinin konuyu kavramasına yardımcı olacaksın. Karşındakine her zaman hoş görülü ve şefkatli ol.\n'
-			'- Konuyu bir paragrafta kısaca açıkla. Konunun kavranması için en az $kMinGorev en fazla $kMaxGorev görev ver. Görevler örnek soru, araştırma konusu, serbest ödev vb olabilir. Eğer bilimsel bir formül yazman gerekirse latex kullan.\n'
+			'- Sadece eğitsel sorulara cevap ver.'
+				'Sana sorulan soruların cevaplarını direkt olarak cevaplamak yerine bir öğretmen gibi '
+				'konuyu açıklayarak karşındakinin konuyu kavramasına yardımcı olacaksın. '
+				'Karşındakine her zaman hoş görülü ve şefkatli ol.\n'
+			'- Konuyu bir paragrafta kısaca açıkla. '
+				'Konunun kavranması için en az $kMinGorev en fazla $kMaxGorev görev ver. '
+				'Görevler örnek soru, araştırma konusu, serbest ödev vb olabilir. '
+				'Eğer bilimsel bir formül yazman gerekirse latex kullan.\n'
 			'- Konuyu daha çok anlamak için gerekecek Google aramasını arama\'ya yaz.\n'
 			'- Sadece valid olan soruları cevapla\n'
 			'- Eğer sana valid olmayan bir soru sorulursa, cevaplamayı kibarca reddet.\n'
 			'- Valid konular eğitsel olanlardır.\n'
 			'- Siyasi ve ideolojik sorulara kesinlikle cevap verme\n'
 			'- Valid olmayan konular gaming, küfür, ahlak dışı şeyler, siyaset, devam eden savaşlar vb.\n'
-			'- Eğer sana kendin hakkında bir soru sorulursa veya sana selam verilirse kim olduğunu tanıt, görev verme ve valid\'i false olarak işaretle.'
-			'- Nasıl hissettiğini sorarlarsa iyi olduğunu söyle ve valid\'i false olarak işaretle'
+			'- Eğer sana kendin hakkında bir soru sorulursa veya sana selam verilirse kim olduğunu tanıt, '
+				'görev verme ve valid\'i false olarak işaretle.\n'
+			'- Nasıl hissettiğini sorarlarsa iyi olduğunu söyle ve valid\'i false olarak işaretle\n'
 			),
 		);
 
-		final chat = model.startChat(history: [
-		]);
+		final chat = model.startChat();
 		final content = Content.text(prompt);
 
 		return chat.sendMessage(content);
 	}
 }
 
-class AtiMessage {
-	AtiMessage({
+class AtiResponse {
+	AtiResponse({
 		required this.aciklama,
 		required this.egitimDuzeyi,
 		required this.konu,
 		required this.gorevler,
 		required this.valid,
+		required this.difficulty,
 		this.arama
 	});
 
 	final String aciklama;
 	final String egitimDuzeyi;
+	final double difficulty;
 	final String konu;
 	final List<String> gorevler;
 	final bool valid;
 	final String? arama;
 
-	static AtiMessage fromJson(Map<String, dynamic> json){
-		return AtiMessage(
-			aciklama: json["Açıklama"],
-			egitimDuzeyi: json["Eğitim Düzeyi"],
-			konu: json["Konu"],
-			gorevler: (json["Görevler"] as List).map<String>((el)=>el.toString()).toList(),
-			valid: json["valid"],
-			arama: json["Arama"]
-		);
-	}
+	AtiResponse.fromJson(Map<String, dynamic> json)
+			: aciklama = json["Açıklama"],
+				egitimDuzeyi = json["Eğitim Düzeyi"],
+				difficulty = json["Zorluk"],
+				konu = json["Konu"],
+				gorevler = (json["Görevler"] as List).map<String>((el)=>el.toString()).toList(),
+				valid = json["valid"],
+				arama = json["Arama"];
+
 }
 
 

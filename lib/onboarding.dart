@@ -1,12 +1,11 @@
+import 'package:ati/data.dart';
 import 'package:ati/main.dart';
-import 'package:ati/profile.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:visibility_detector/visibility_detector.dart';
 
 class Onboarding extends StatefulWidget {
-  final Function() refreshParent;
-  const Onboarding({super.key, required this.refreshParent});
+  const Onboarding({super.key});
 
   @override
   State<Onboarding> createState() => _OnboardingState();
@@ -24,13 +23,6 @@ class _OnboardingState extends State<Onboarding> {
   @override
   initState() {
     super.initState();
-
-		user = User.empty;
-
-  }
-
-  Future<void> _saveSettings() async {
-		saveUser();
   }
 
   List<Widget> buildPages(context) {
@@ -49,8 +41,8 @@ class _OnboardingState extends State<Onboarding> {
 				title: "Adın?",
 				content: TextField(
 					onChanged: (value) {
-						user.name = value;
-						canProceed.value = user.name.length >= 3;
+						data.user.name = value;
+						canProceed.value = data.user.name.length >= 3;
 					},
 					onSubmitted: (_)=>setState(() {
 						if (canProceed.value) {
@@ -63,16 +55,16 @@ class _OnboardingState extends State<Onboarding> {
 					}),
 					autofocus: true,
 					controller: TextEditingController(
-						text: user.name
+						text: data.user.name
 					),
 				),
-				proceedCondition: ()=> (user.name.length >= 3),
+				proceedCondition: () => (data.user.name.length >= 3),
 			),
 			OnboardingPage(
 				title: "Yaşın?",
 				content: CupertinoPicker(
 					itemExtent: 48,
-					onSelectedItemChanged: (value) {user.age = value;},
+					onSelectedItemChanged: (value) {data.user.age = value;},
 					children: List.generate(
 						100,
 						(index) => Center(
@@ -210,7 +202,7 @@ class _OnboardingState extends State<Onboarding> {
 											),
 											onPressed: canProceedValue ? 
 											() {
-												_saveSettings();
+												saveData();
 												prefs.setBool("initialized", true);
 												Navigator.popAndPushNamed(
 													context,

@@ -1,6 +1,8 @@
 import 'dart:ui';
 
 import 'package:ati/chat.dart';
+import 'package:ati/data.dart';
+import 'package:ati/onboarding.dart';
 import 'package:ati/tasks.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -17,9 +19,8 @@ void main() async {
 		child: MyApp()
 	));
 	prefs = await SharedPreferences.getInstance();
-	loadMessages();
-	loadTasks();
-	loadUser();
+	loadData();
+	print("klfdjaskldjak");
 }
 
 class MyApp extends StatelessWidget {
@@ -51,7 +52,11 @@ class MyApp extends StatelessWidget {
 					centerTitle: true,
 				),
       ),
-      home: const HomeScreen(),
+			routes: {
+				"home": (context) => const HomeScreen(),
+				"onboarding": (context) => const Onboarding(),
+			},
+			initialRoute: (prefs.getBool("initialized") ?? false) ? "home" : "onboarding",
     );
   }
 }
@@ -96,9 +101,13 @@ class _HomeScreenState extends State<HomeScreen> {
 										context,
 										MaterialPageRoute(builder: (context){return const UserProfile();})
 									);},
-									child: Image.asset(
-										user.pfpAsset,
-										height: kToolbarHeight - 16,
+									child: ListenableBuilder(
+										listenable: data,
+										builder: (context, widget) =>
+											Image.asset(
+												data.user.profilePictureAsset,
+												height: kToolbarHeight - 16,
+											)
 									)
 								)
 							)
@@ -220,12 +229,9 @@ class HomeGreet extends StatelessWidget {
 							SizedBox(
 								height: 64,
 								width: 350,
-								child:SearchBox(
+								child: SearchBox(
 									onSubmitted: (s){
-										/*messages.add(ChatMessage(
-											type: ChatMessageType.pending,
-											data: s
-										));*/
+										data.sendMessage(s);
 										changePage(0);
 									},
 								)
