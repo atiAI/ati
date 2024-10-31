@@ -71,7 +71,8 @@ flutter:
   assets:
     - assets/images/yuzuncuyil.png
     - assets/images/user.png
-    - assets/images/background_A.png
+    - assets/images/bigA.png
+    - assets/images/smallA.png
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/to/resolution-aware-images

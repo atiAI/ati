@@ -22,6 +22,11 @@ void main() async {
 	loadData();
 }
 
+const Map<Brightness, Color> logoTints = {
+	Brightness.light: Color(0x302A2AD2),
+	Brightness.dark: Color(0x40AEAEF8)
+};
+
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
 
@@ -34,6 +39,7 @@ class MyApp extends StatelessWidget {
 			debugShowCheckedModeBanner: false,
       title: 'Ati - Educational AI',
 			themeMode: data.themeMode,
+			// AYDINLIK MOD
       theme: ThemeData(
         useMaterial3: true,
 				colorScheme: const ColorScheme(
@@ -42,31 +48,31 @@ class MyApp extends StatelessWidget {
 					onPrimary: Colors.white,
 					secondary: Color(0xff726DFF),
 					onSecondary: Colors.white,
-					tertiary: Color(0xff0091ff),
+					tertiary: Color(0xffB3D3EC),
 					onTertiary: Colors.black,
-					error: Color(0xffffaaaa),
+					error: Color(0xfffc5a4e),
 					onError: Colors.black,
-					surface: Color(0xffe0e0ff),
+					surface: Color(0xffE0E0FF),
 					onSurface: Colors.black,
 				),
 				appBarTheme: const AppBarTheme(	
-	        backgroundColor: Color(0xffd5cdf4),
+	        backgroundColor: Color(0xccBEBEF4),
 					foregroundColor: Color(0xff404040),
 					centerTitle: true,
 				),
 				dialogTheme: const DialogTheme(
-					backgroundColor: Color(0xff2738ce),
 					titleTextStyle: TextStyle(
 						fontWeight: FontWeight.bold,
-						color: Colors.white,
+						color: Colors.black,
 						fontSize: 28,
 					),
 					contentTextStyle: TextStyle(
 						fontWeight: FontWeight.normal,
-						color: Colors.white,
+						color: Colors.black,
 					)
 				),
       ),
+			// KARANLIK MOD
       darkTheme: ThemeData(
         useMaterial3: true,
 				colorScheme: const ColorScheme(
@@ -86,6 +92,17 @@ class MyApp extends StatelessWidget {
 	        backgroundColor: Color(0xd3080838),
 					foregroundColor: Color(0xffbebebe),
 					centerTitle: true,
+				),
+				dialogTheme: const DialogTheme(
+					titleTextStyle: TextStyle(
+						fontWeight: FontWeight.bold,
+						color: Colors.white,
+						fontSize: 28,
+					),
+					contentTextStyle: TextStyle(
+						fontWeight: FontWeight.normal,
+						color: Colors.white,
+					)
 				),
       ),
 			routes: {
@@ -229,7 +246,8 @@ class HomeGreet extends StatelessWidget {
 					child: Padding(
 						padding: const EdgeInsets.only(top: 64, right: 16),
 						child: Image.asset(
-							"assets/images/background_A.png",
+							color: logoTints[Theme.of(context).brightness],
+							"assets/images/bigA.png",
 							fit: BoxFit.cover,
 							height: MediaQuery.of(context).size.height - 192,
 						)
@@ -334,7 +352,8 @@ class _SearchBoxState extends State<SearchBox> {
 													icon: AnimatedSize(
 													duration: const Duration(milliseconds: 100),
 													child: Image.asset(
-														"assets/images/background_A.png",
+														"assets/images/smallA.png",
+														color: Colors.white38,
 														height: controller.text.isEmpty ? 32 : 0 
 													)
 													),

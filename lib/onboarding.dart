@@ -31,7 +31,6 @@ class _OnboardingState extends State<Onboarding> {
           "Başlamadan önce seni biraz tanıyalım.",
           style: TextStyle(
             fontSize: 16,
-            color: Colors.white70,
           ),
         ),
       ),
@@ -205,8 +204,8 @@ class _OnboardingState extends State<Onboarding> {
 										)
 									: TextButton(
 											style: TextButton.styleFrom(
-												foregroundColor: Colors.white,
-												disabledForegroundColor: Colors.grey
+												foregroundColor: Theme.of(context).colorScheme.onSurface,
+												disabledForegroundColor: Theme.of(context).colorScheme.onSurface.withOpacity(0.3),
 											),
 											onPressed: canProceedValue ? 
 											() {
