@@ -68,19 +68,62 @@ showCardDetails(BuildContext context, Task card, Function onComplete){
 	);
 }
 
-class TaskCardDialog extends StatelessWidget {
+class TaskCardDialog extends StatefulWidget {
   const TaskCardDialog(this.card, this.onComplete, {super.key});
 
 	final Task card;
 	final Function onComplete;
 
-  @override
-  Widget build(BuildContext context) {
+  State<TaskCardDialog> createState() => _TaskCardDialogState();
+}
+
+class _TaskCardDialogState extends State<TaskCardDialog> with SingleTickerProviderStateMixin {
+
+	late AnimationController _controller;
+	late Animation<double> _flipAnimation;
+	bool isFront = true;
+
+	@override initState() {
+		super.initState();
+
+		_controller = AnimationController(
+			duration: const Duration(milliseconds: 500),
+			vsync: this
+		);
+
+		_flipAnimation = 
+			Tween(begin: 0.0, end: pi)
+			.animate(_controller)
+			..addListener((){setState((){});});
+
+	}
+
+	@override
+	Widget build(BuildContext context) {
+		return 
+			AnimatedBuilder(
+				animation: _flipAnimation,
+				builder: (context, child) {
+					final isFrontVisible = _flipAnimation.value < pi/2;
+					return Transform(
+						transform: Matrix4.rotationY(_flipAnimation.value),
+						alignment: Alignment.center,
+						child: isFrontVisible ?
+							buildFront(context) :
+							Transform.flip(
+								flipX: true,
+								child: buildBack(context),
+							),
+					);
+				}
+			);
+	}
+
+  Widget buildFront(BuildContext context) {
     return Dialog(
 			backgroundColor: Theme.of(context).colorScheme.primary,
 			child: AspectRatio(
 				aspectRatio: 5/8,
-				child: SizedBox(
 				child: Padding(
 					padding: const EdgeInsets.symmetric(vertical: 32),
 					child: Stack(
@@ -88,30 +131,46 @@ class TaskCardDialog extends StatelessWidget {
 						LayoutBuilder(builder: (context, constrains)=>
 							Center(
 								child:Icon(
-									atiIcons[card.konu],
+									atiIcons[widget.card.konu],
 									color: Theme.of(context).colorScheme.onPrimary.withOpacity(0.1),
 									size: min(300, constrains.maxWidth - 50),
 								)
 							),
 						),
 						Column(children: [
-							Padding(
-								padding: const EdgeInsets.all(12),
-								child: Center(
-									child: Text(
-										card.konu,
-										style: Theme.of(context).dialogTheme.titleTextStyle
+							Stack(children: [
+								Align(
+									alignment: AlignmentDirectional.topEnd,
+									child: Padding(
+										padding: const EdgeInsets.only(right: 20, top: 4),
+										child: IconButton(
+											color: Theme.of(context).colorScheme.onPrimary,
+											onPressed: (){
+												isFront = false;
+												_controller.forward();
+											},
+											icon: const Icon(Icons.question_mark)
+										),
 									)
-								)
-							),
+								),
+								Padding(
+									padding: const EdgeInsets.all(12),
+									child: Center(
+										child: Text(
+											widget.card.konu,
+											style: Theme.of(context).dialogTheme.titleTextStyle
+										)
+									)
+								),
+							]),
 							Expanded(
 								child: Padding(
 									padding: const EdgeInsets.symmetric(
 										vertical: 48, horizontal: 32
 									),
 									child: Center(
-										child: Text(
-											card.task,
+										child: SelectableText(
+											widget.card.task,
 											textAlign: TextAlign.center,
 											style: Theme.of(context).dialogTheme.contentTextStyle
 										)
@@ -125,7 +184,7 @@ class TaskCardDialog extends StatelessWidget {
 									foregroundColor: Theme.of(context).colorScheme.onSecondary
 								),
 								onPressed: (){
-									onComplete();
+									widget.onComplete();
 									Navigator.pop(context);
 								},
 								label: const Padding(
@@ -137,6 +196,88 @@ class TaskCardDialog extends StatelessWidget {
 						])
 					])
 				)
+			)
+		);
+	}
+  
+  Widget buildBack(BuildContext context) {
+    return Dialog(
+			backgroundColor: Theme.of(context).colorScheme.secondary,
+			child: AspectRatio(
+				aspectRatio: 5/8,
+				child: Padding(
+					padding: const EdgeInsets.symmetric(vertical: 32),
+					child: Stack(
+					children: [
+						LayoutBuilder(builder: (context, constrains)=>
+							Center(
+								child:Icon(
+									Icons.question_mark,
+									color: Theme.of(context).colorScheme.onPrimary.withOpacity(0.1),
+									size: min(300, constrains.maxWidth - 50),
+								)
+							),
+						),
+						Column(children: [
+							Stack(children: [
+								Align(
+									alignment: AlignmentDirectional.topEnd,
+									child: Padding(
+										padding: const EdgeInsets.only(right: 20, top: 12),
+										child: IconButton(
+											color: Theme.of(context).colorScheme.onPrimary,
+											onPressed: (){
+												_controller.reverse();
+												isFront = true;
+											},
+											icon: const Icon(Icons.arrow_forward)
+										),
+									)
+								),
+								Padding(
+									padding: const EdgeInsets.all(12),
+									child: Center(
+										child: Text(
+											"Açıklama",
+											style: Theme.of(context).dialogTheme.titleTextStyle
+										)
+									)
+								),
+							]),
+							Expanded(
+								child: Padding(
+									padding: const EdgeInsets.symmetric(
+										vertical: 48, horizontal: 32
+									),
+									child: Center(
+									child: SingleChildScrollView(
+										child: SelectableText(
+											widget.card.description,
+											textAlign: TextAlign.center,
+											style: Theme.of(context).dialogTheme.contentTextStyle
+										),
+									),
+								),
+								)
+							),
+							ElevatedButton.icon(
+								style: ElevatedButton.styleFrom(
+									textStyle: const TextStyle(fontSize: 18),
+									backgroundColor: Theme.of(context).colorScheme.primary,
+									foregroundColor: Theme.of(context).colorScheme.onPrimary
+								),
+								onPressed: (){
+									// TODO: Yardım iste -> Görevsiz mesaj
+									Navigator.pop(context);
+								},
+								label: const Padding(
+									padding: EdgeInsets.symmetric(vertical: 8),
+									child: Text("Yardım iste")
+								),
+								icon: const Icon(Icons.chat)
+							)
+						])
+					])
 				)
 			)
 		);

@@ -5,7 +5,7 @@ import 'package:google_generative_ai/google_generative_ai.dart';
 import 'package:toastification/toastification.dart';
 
 class AtiGemini {
-	static Future<GenerateContentResponse?> ask(String prompt) async {
+	static Future<GenerateContentResponse?> askGeneric(String prompt) async {
 		var geminiKey = prefs.getString("geminiKey");
 		if (geminiKey == null ) {
 			toastification.show(

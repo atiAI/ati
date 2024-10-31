@@ -82,7 +82,7 @@ class Data extends ChangeNotifier {
 
 		notifyListeners();
 
-		final gcResponse = await AtiGemini.ask(prompt);
+		final gcResponse = await AtiGemini.askGeneric(prompt);
 		final String text = gcResponse?.text ?? "{}";
 		final AtiResponse response = AtiResponse.fromJson(jsonDecode(text));
 
@@ -99,7 +99,8 @@ class Data extends ChangeNotifier {
 				task: response.gorevler[i],
 				konu: response.konu,
 				difficulty: response.difficulty,
-				timeStamp: DateTime.now()
+				timeStamp: DateTime.now(),
+				description: response.aciklama
 			));
 		}
 		messages.add(ChatMessage(
@@ -177,25 +178,29 @@ class Task {
   final String konu;
   final double difficulty;
   final DateTime timeStamp;
+	final String description;
 
 	Task({
 		required this.task,
 		required this.konu,
 		required this.difficulty,
-		required this.timeStamp
+		required this.timeStamp,
+		required this.description,
 	});
 
   Task.fromJson(Map<String, dynamic> json)
-      : task = json["task"] ?? '',
-        konu = json["konu"] ?? '',
-        difficulty = (json["difficulty"] as double?) ?? 0.0, // handles missing/invalid values
-        timeStamp = DateTime.fromMillisecondsSinceEpoch(json["timeStamp"] ?? 0);
+      : task = json["task"] ?? '<BUG> NO TASK',
+        konu = json["konu"] ?? '<BUG> NO CATEGORY',
+        difficulty = (json["difficulty"] as double?) ?? -1,
+				timeStamp = DateTime.fromMillisecondsSinceEpoch(json["timeStamp"] ?? 0),
+				description = json ["description"] ?? '<BUG> NO DESCRIPTION';
 
   Map<String, dynamic> toJson() => {
         "task": task,
         "konu": konu,
         "difficulty": difficulty,
         "timeStamp": timeStamp.millisecondsSinceEpoch,
+				"description": description,
       };
 }
 

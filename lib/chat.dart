@@ -96,16 +96,20 @@ class _ChatPageState extends State<ChatPage> with AutomaticKeepAliveClientMixin{
 								]
 							),
 						) :
-						const Center(
+						Center(
 							child: Column(
 								mainAxisSize: MainAxisSize.min,
 								children: [
-									Icon(Icons.chat, size: 82,),
-									Text("Sohbete Başla", style: TextStyle(fontSize: 32)),
+									const Icon(Icons.chat, size: 82,),
+									const Text("Sohbete Başla", style: TextStyle(fontSize: 32)),
 									Text("Ati'ye bir soru sor.",
-										style: TextStyle(fontSize: 18, color: Colors.white70)
+										style: TextStyle(
+											fontSize: 18,
+											color: Theme.of(context)
+												.colorScheme.onSurface.withOpacity(0.7)
+										)
 									),
-									SizedBox(height: 50,)
+									const SizedBox(height: 50,)
 								]
 							)
 						),
