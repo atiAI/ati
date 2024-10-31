@@ -20,7 +20,6 @@ void main() async {
 	));
 	prefs = await SharedPreferences.getInstance();
 	loadData();
-	print("klfdjaskldjak");
 }
 
 class MyApp extends StatelessWidget {
@@ -29,25 +28,62 @@ class MyApp extends StatelessWidget {
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
+    return ListenableBuilder(
+		listenable: data,
+		builder: (context, child) => MaterialApp(
 			debugShowCheckedModeBanner: false,
       title: 'Ati - Educational AI',
+			themeMode: data.themeMode,
       theme: ThemeData(
         useMaterial3: true,
 				colorScheme: const ColorScheme(
-					brightness: Brightness.dark,
-					primary: Color(0xff3b178e),
+					brightness: Brightness.light,
+					primary: Color(0xff4A69F1),
 					onPrimary: Colors.white,
-					secondary: Color(0xff4a3283),
+					secondary: Color(0xff726DFF),
 					onSecondary: Colors.white,
+					tertiary: Color(0xff0091ff),
+					onTertiary: Colors.black,
+					error: Color(0xffffaaaa),
+					onError: Colors.black,
+					surface: Color(0xffe0e0ff),
+					onSurface: Colors.black,
+				),
+				appBarTheme: const AppBarTheme(	
+	        backgroundColor: Color(0xffd5cdf4),
+					foregroundColor: Color(0xff404040),
+					centerTitle: true,
+				),
+				dialogTheme: const DialogTheme(
+					backgroundColor: Color(0xff2738ce),
+					titleTextStyle: TextStyle(
+						fontWeight: FontWeight.bold,
+						color: Colors.white,
+						fontSize: 28,
+					),
+					contentTextStyle: TextStyle(
+						fontWeight: FontWeight.normal,
+						color: Colors.white,
+					)
+				),
+      ),
+      darkTheme: ThemeData(
+        useMaterial3: true,
+				colorScheme: const ColorScheme(
+					brightness: Brightness.dark,
+					primary: Color(0xff3142d8),
+					onPrimary: Colors.white,
+					secondary: Color(0xff5d1bb3),
+					onSecondary: Colors.white,
+					tertiary: Color(0xff0090ff),
+					onTertiary: Colors.black,
 					error: Color(0xffdd0000),
 					onError: Colors.white,
 					surface: Color(0xff00001e),
 					onSurface: Colors.white,
-
 				),
 				appBarTheme: const AppBarTheme(	
-	        backgroundColor: Color(0x57130B32),
+	        backgroundColor: Color(0xd3080838),
 					foregroundColor: Color(0xffbebebe),
 					centerTitle: true,
 				),
@@ -57,7 +93,7 @@ class MyApp extends StatelessWidget {
 				"onboarding": (context) => const Onboarding(),
 			},
 			initialRoute: (prefs.getBool("initialized") ?? false) ? "home" : "onboarding",
-    );
+    ));
   }
 }
 
@@ -76,6 +112,7 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+			extendBodyBehindAppBar: true,
       appBar: AppBar(
 				actions: [
 					Stack(
@@ -203,8 +240,10 @@ class HomeGreet extends StatelessWidget {
 						mainAxisAlignment: MainAxisAlignment.center,
 						children: [
 							Container(
-								decoration: const BoxDecoration(
-									border: Border(left: BorderSide(color: Colors.white60, width: 2))
+								decoration: BoxDecoration(
+									border: Border(
+										left: BorderSide(width: 2, color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6))
+									)
 								),
 								child: Padding(
 									padding: const EdgeInsets.all(16),
@@ -219,7 +258,10 @@ class HomeGreet extends StatelessWidget {
 											Text(
 												"Create Your Workspace",
 												style: Theme.of(context).textTheme.titleLarge
-													?.copyWith(color: Colors.white70)
+													?.copyWith(
+														color: Theme.of(context)
+															.colorScheme.onSurface.withOpacity(0.7)
+													)
 											),
 										]
 									)
@@ -272,7 +314,7 @@ class _SearchBoxState extends State<SearchBox> {
 				child: BackdropFilter(
 					filter: ImageFilter.blur(sigmaY: 4, sigmaX: 4),
 					child: Container(
-						color: const Color(0xA513003F),
+						color: Theme.of(context).colorScheme.secondary.withOpacity(0.5),
 						child: Padding(
 							padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
 							child: Row(
@@ -284,7 +326,10 @@ class _SearchBoxState extends State<SearchBox> {
 												controller: controller,
 												onSubmitted: controller.text.isNotEmpty ? widget.onSubmitted : null,
 												onChanged: (s)=>setState((){}),
-												style: const TextStyle(fontSize: 14),
+												style: TextStyle(
+													fontSize: 16,
+													color: Theme.of(context).colorScheme.onSecondary,
+												),
 												decoration: InputDecoration(
 													icon: AnimatedSize(
 													duration: const Duration(milliseconds: 100),
@@ -297,10 +342,13 @@ class _SearchBoxState extends State<SearchBox> {
 														onTap: ()=>widget.onSubmitted(controller.text),
 														child: Icon(Icons.send, size: controller.text.isEmpty ? 0 : 26)
 													),
-													fillColor: const Color(0xA500001E),
+													fillColor: Theme.of(context).colorScheme.secondary.withOpacity(0.8),
 													filled: true,
-													hintText: "Fizik basit makineler animasyon",
-													hintStyle: const TextStyle(color: Colors.white54, fontSize: 14),
+													hintText: "ACİL TextField teması lazım",
+													hintStyle: TextStyle(
+														color: Theme.of(context).colorScheme.onSecondary.withOpacity(0.54),
+														fontSize: 14
+													),
 												),
 											),
 										)

@@ -1,6 +1,7 @@
 import 'dart:math';
 import 'package:ati/data.dart';
 import 'package:ati/main.dart';
+import 'package:ati/onboarding.dart';
 import 'package:flutter/material.dart';
 import 'package:toastification/toastification.dart';
 
@@ -92,7 +93,7 @@ class _UserProfileState extends State<UserProfile> {
 							),
 						);
 					},
-					iconData: Icons.person,
+					iconData: Icons.auto_awesome,
 				),
 				SettingsRow(
 					name: "Gelişmiş Ayarlar",
@@ -128,8 +129,19 @@ class _UserProfileState extends State<UserProfile> {
 							)
 						);
 					},
-					iconData: Icons.person,
+					iconData: Icons.settings,
 				),
+				const SizedBox(height: 120),
+				const Center(
+					child:Row(
+						mainAxisSize: MainAxisSize.min,
+						children: [
+							ThemeButton(ThemeMode.light, Icons.light_mode, "Açık", autoSaveData: true,),
+							ThemeButton(ThemeMode.system, Icons.brightness_4, "Sistem", autoSaveData: true,),
+							ThemeButton(ThemeMode.dark, Icons.dark_mode, "Koyu", autoSaveData: true,)
+						]
+					),
+				)
 			]),
 			)
 			)
@@ -153,6 +165,7 @@ class SettingsRow extends StatelessWidget {
 			borderRadius: BorderRadius.circular(8),
 			child: Material(
 				color: Theme.of(context).colorScheme.primary,
+				textStyle: TextStyle(color: Theme.of(context).colorScheme.onPrimary),
 				child: InkWell(
 					onTap: onTap,
 					borderRadius: BorderRadius.circular(8),
@@ -161,14 +174,21 @@ class SettingsRow extends StatelessWidget {
 							vertical: 14, horizontal: 20
 						),
 						child: Row(children: [
-							Icon(iconData),
+							Icon(
+								iconData,
+								color: Theme.of(context).colorScheme.onPrimary
+							),
+							const SizedBox(width: 8),
 							Expanded(
 								child: Text(
 									name,
 									style: const TextStyle(fontSize: 18)
 								)
 							),
-							const Icon(Icons.chevron_right_rounded)
+							Icon(
+								Icons.chevron_right_rounded,
+								color: Theme.of(context).colorScheme.onPrimary
+							)
 						])
 					)
 				)

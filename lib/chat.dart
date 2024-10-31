@@ -27,7 +27,7 @@ Widget bubble;
 					bubble = 
 					Shimmer.fromColors(
 						baseColor: Theme.of(context).colorScheme.secondary,
-						highlightColor: Colors.white,
+						highlightColor: Theme.of(context).colorScheme.tertiary,
 						child: BubbleNormal(
 							isSender: false,
 							text: "Ati yazıyor...",

@@ -34,9 +34,13 @@ class _TaskCardState extends State<TaskCard> {
 							padding: const EdgeInsets.only(
 								left: 16, right: 16, top: 14, bottom: 22),
 							child: Column(children:[
-								Icon(atiIcons[widget.gorev.konu]),
+								Icon(
+									atiIcons[widget.gorev.konu],
+									color: Theme.of(context).colorScheme.onPrimary,
+								),
 								Text(
 									widget.gorev.task,
+									style: TextStyle(color: Theme.of(context).colorScheme.onPrimary),
 									textAlign: TextAlign.center
 								),
 							])
@@ -85,7 +89,7 @@ class TaskCardDialog extends StatelessWidget {
 							Center(
 								child:Icon(
 									atiIcons[card.konu],
-									color: Colors.white10,
+									color: Theme.of(context).colorScheme.onPrimary.withOpacity(0.1),
 									size: min(300, constrains.maxWidth - 50),
 								)
 							),
@@ -96,7 +100,7 @@ class TaskCardDialog extends StatelessWidget {
 								child: Center(
 									child: Text(
 										card.konu,
-										style: Theme.of(context).textTheme.titleLarge
+										style: Theme.of(context).dialogTheme.titleTextStyle
 									)
 								)
 							),
@@ -106,7 +110,11 @@ class TaskCardDialog extends StatelessWidget {
 										vertical: 48, horizontal: 32
 									),
 									child: Center(
-										child: Text(card.task, textAlign: TextAlign.center,)
+										child: Text(
+											card.task,
+											textAlign: TextAlign.center,
+											style: Theme.of(context).dialogTheme.contentTextStyle
+										)
 									),
 								)
 							),
@@ -152,32 +160,6 @@ class _TasksPageState extends State<TasksPage> {
     return
 		Row(
 			children: [
-				/*Center(
-					child: Column(
-						mainAxisSize: MainAxisSize.min,
-						children: List<Widget>.generate(
-							gorevler.length,
-							(i) {
-								bool active = i == currentCard;
-								return Padding(
-									padding: const EdgeInsets.all(4),
-									child: ClipRRect(
-										borderRadius: BorderRadius.circular(5),
-										child: AnimatedSize(
-										duration: const Duration(milliseconds: 200),
-										child: Container(
-											width: active ? 10 : 6,
-											height: active ? 10 : 6,
-											color: active ?
-												Colors.white : Colors.white38,
-										)
-										)
-									)
-								);
-							}
-						)
-					)
-				),*/
 				Expanded(
 					child: ListView.builder(	
 						itemBuilder: (context, index) => TaskCard(
@@ -190,9 +172,6 @@ class _TasksPageState extends State<TasksPage> {
 						),
 						itemCount: data.tasks.length,
 						scrollDirection: Axis.vertical,
-						/*onPageChanged: (p)=>setState((){
-							currentCard = p;
-						})*/
 					)
 				)
 			]

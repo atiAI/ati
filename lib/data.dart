@@ -26,6 +26,7 @@ class Data extends ChangeNotifier {
   final List<ChatMessage> _messages;
   final List<Task> _tasks;
   final User _user;
+	ThemeMode _themeMode;
 
   Data.fromJson(Map<String, dynamic> json)
       : _messages = (json["messages"] as List? ?? [])
@@ -34,22 +35,31 @@ class Data extends ChangeNotifier {
         _tasks = (json["tasks"] as List? ?? [])
             .map((t) => Task.fromJson(t))
             .toList(),
-        _user = User.fromJson(json["user"]);
+        _user = User.fromJson(json["user"]),
+				_themeMode = ThemeMode.values[json["themeMode"] ?? 2];
+
+  Map<String, dynamic> toJson() => {
+        "messages": _messages.map((m) => m.toJson()).toList(),
+        "tasks": _tasks.map((t) => t.toJson()).toList(),
+        "user": _user.toJson(),
+				"themeMode": _themeMode.index,
+      };
 
 	Data.clean()
 		: _messages = [],
 			_tasks = [],
-			_user = User.empty;
+			_user = User.empty,
+			_themeMode = ThemeMode.dark;
 
   List<ChatMessage> get messages => _messages;
   List<Task> get tasks => _tasks;
   User get user => _user;
+	ThemeMode get themeMode => _themeMode;
 
   void addMessage(ChatMessage message) {
     _messages.add(message);
     notifyListeners();
   }
-
 
 	Future sendMessage(String prompt) async {
 		messages.add(ChatMessage(
@@ -132,11 +142,10 @@ class Data extends ChangeNotifier {
     notifyListeners();
   }
 
-  Map<String, dynamic> toJson() => {
-        "messages": _messages.map((m) => m.toJson()).toList(),
-        "tasks": _tasks.map((t) => t.toJson()).toList(),
-        "user": _user.toJson(),
-      };
+	void setThemeMode(ThemeMode mode) {
+		_themeMode = mode;
+		notifyListeners();
+	}
 }
 
 class ChatMessage {

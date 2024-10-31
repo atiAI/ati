@@ -18,8 +18,6 @@ class _OnboardingState extends State<Onboarding> {
   int currentPage = 0;
 	bool eula = false;
 
-  Brightness brightness = Brightness.dark;
-
   @override
   initState() {
     super.initState();
@@ -78,6 +76,16 @@ class _OnboardingState extends State<Onboarding> {
 					)
 				)
 			),
+			const OnboardingPage(
+				title: "Görünüş",
+				content: Row(
+					children: [
+						ThemeButton(ThemeMode.light, Icons.light_mode, "Açık"),
+						ThemeButton(ThemeMode.system, Icons.brightness_4, "Sistem"),
+						ThemeButton(ThemeMode.dark, Icons.dark_mode, "Koyu")
+					]
+				),
+			),
       OnboardingPage(
         title: "Tamamdır!",
 				content: 
@@ -132,7 +140,7 @@ class _OnboardingState extends State<Onboarding> {
 								? Radius.zero 
 								: const Radius.circular(20)
 						),
-						color: Colors.white
+						color: Theme.of(context).colorScheme.primary
 						),
 						width: width,
 					),
@@ -291,5 +299,60 @@ class OnboardingPage extends StatelessWidget {
         ),
       ),
     );
+  }
+}
+
+class ThemeButton extends StatelessWidget {
+  const ThemeButton (this.mode, this.iconData, this.text, {this.autoSaveData, super.key});
+
+	final ThemeMode mode;
+	final IconData iconData;
+	final String text;
+	final bool? autoSaveData;
+
+  @override
+  Widget build(BuildContext context) {
+    return ListenableBuilder(
+			listenable: data,
+			builder: (context, _) => 
+				Padding(
+					padding: const EdgeInsets.all(12),
+					child: ClipRRect(
+						borderRadius: BorderRadius.circular(12),
+						child: Material(
+							color: data.themeMode == mode ?
+								Theme.of(context).colorScheme.primary :
+								Theme.of(context).colorScheme.secondary.withOpacity(0.7),
+							child: InkWell(
+								onTap: (){
+									data.setThemeMode(mode);
+									if (autoSaveData == true) {
+										saveData();
+									}
+								},
+								child: Padding(
+									padding: const EdgeInsets.all(14),
+									child: Column(
+										mainAxisSize: MainAxisSize.min,
+										children: [
+											Icon(
+												iconData,
+												size: 58,
+												color: Theme.of(context).colorScheme.onPrimary
+											),
+											const SizedBox(height: 8),
+											Text(
+												text,
+												style: TextStyle(
+													color: Theme.of(context).colorScheme.onPrimary),
+												)
+										],
+									),
+								)
+							)
+						)
+					)
+				)
+		);
   }
 }
