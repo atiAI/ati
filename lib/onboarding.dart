@@ -1,5 +1,6 @@
 import 'package:ati/data.dart';
 import 'package:ati/main.dart';
+import 'package:ati/profile.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:visibility_detector/visibility_detector.dart';
@@ -57,23 +58,9 @@ class _OnboardingState extends State<Onboarding> {
 				),
 				proceedCondition: () => (data.user.name.length >= 3),
 			),
-			OnboardingPage(
+			const OnboardingPage(
 				title: "Yaşın?",
-				content: CupertinoPicker(
-					itemExtent: 48,
-					onSelectedItemChanged: (value) {data.user.age = value;},
-					children: List.generate(
-						100,
-						(index) => Center(
-							child: Text(
-								(index == 0) ?
-								"Belirtmek İstemiyorum" :
-								"$index",
-								style: const TextStyle(fontSize: 18),
-							)
-						)
-					)
-				)
+				content: AgePicker()
 			),
 			const OnboardingPage(
 				title: "Görünüş",

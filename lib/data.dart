@@ -98,6 +98,7 @@ class Data extends ChangeNotifier {
 			tasks.add(Task(
 				task: response.gorevler[i],
 				konu: response.konu,
+				soru: prompt,
 				difficulty: response.difficulty,
 				timeStamp: DateTime.now(),
 				description: response.aciklama
@@ -126,6 +127,45 @@ class Data extends ChangeNotifier {
 
 		saveData();
 
+	}
+
+	Future taskHelp(Task task, String? prompt) async {
+		messages.add(ChatMessage(
+			role: ChatRole.user,
+			timeStamp: DateTime.now(),
+			gorevRef: task,
+			data: prompt,
+			tail: true
+		));
+
+		notifyListeners();
+
+		await Future.delayed(kSimulatedDelay);
+
+		messages.add(ChatMessage(
+			role: ChatRole.bot,
+			tail: true,
+			data: null,
+			timeStamp: DateTime.now(),
+		));
+
+		notifyListeners();
+
+		final answer = await AtiGemini.askTaskHelp(task, prompt);
+		
+		messages.removeLast();
+
+		messages.add(
+			ChatMessage(
+				role: ChatRole.bot,
+				timeStamp: DateTime.now(),
+				data: answer?.text,
+				tail: true,
+			)
+		);
+
+		notifyListeners();
+		saveData();
 	}
 
   void addTask(Task task) {
@@ -166,15 +206,17 @@ class ChatMessage {
   final DateTime timeStamp;
 	bool? tail;
 	final bool? arama;
+	final Task? gorevRef;
 
-	ChatMessage({this.data, required this.role, required this.timeStamp, this.tail, this.arama});
+	ChatMessage({this.data, required this.role, required this.timeStamp, this.tail, this.arama, this.gorevRef});
 
   ChatMessage.fromJson(Map<String, dynamic> json)
       : data = json["data"] ?? '',
         role = ChatRole.values.elementAt(json["role"] ?? 0),
         timeStamp = DateTime.fromMillisecondsSinceEpoch(json["timeStamp"] ?? 0),
 				tail = json["tail"] ?? false,
-				arama = json["arama"] ?? false;
+				arama = json["arama"] ?? false,
+				gorevRef = json["gorevRef"] != null ? Task.fromJson(json["gorevRef"]) : null;
 
   Map<String, dynamic> toJson() => {
         "data": data,
@@ -182,10 +224,23 @@ class ChatMessage {
         "timeStamp": timeStamp.millisecondsSinceEpoch,
 				"tail": tail ?? false,
 				"arama": arama ?? false,
+				"gorevRef": gorevRef?.toJson(),
       };
 }
 
-enum ChatRole { user, bot }
+enum ChatRole{ 
+	user,
+	bot;
+
+	String get genai {
+		switch (this) {
+			case ChatRole.user:
+				return "user";
+			case ChatRole.bot:
+				return "model";
+		}
+	}
+}
 
 class Task {
   final String task;
@@ -193,6 +248,7 @@ class Task {
   final double difficulty;
   final DateTime timeStamp;
 	final String description;
+	final String soru;
 
 	Task({
 		required this.task,
@@ -200,6 +256,7 @@ class Task {
 		required this.difficulty,
 		required this.timeStamp,
 		required this.description,
+		required this.soru,
 	});
 
   Task.fromJson(Map<String, dynamic> json)
@@ -207,7 +264,8 @@ class Task {
         konu = json["konu"] ?? '<BUG> NO CATEGORY',
         difficulty = (json["difficulty"] as double?) ?? -1,
 				timeStamp = DateTime.fromMillisecondsSinceEpoch(json["timeStamp"] ?? 0),
-				description = json ["description"] ?? '<BUG> NO DESCRIPTION';
+				description = json["description"] ?? '<BUG> NO DESCRIPTION',
+				soru = json["soru"] ?? '<BUG> NO QUESTION';
 
   Map<String, dynamic> toJson() => {
         "task": task,
@@ -215,6 +273,7 @@ class Task {
         "difficulty": difficulty,
         "timeStamp": timeStamp.millisecondsSinceEpoch,
 				"description": description,
+				"soru": soru
       };
 }
 

@@ -1,5 +1,6 @@
 import 'package:ati/data.dart';
 import 'package:ati/main.dart';
+import 'package:ati/tasks.dart';
 import 'package:chat_bubbles/chat_bubbles.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
@@ -14,9 +15,33 @@ class ChatMessageWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-Widget bubble;
+		Widget bubble;
 		switch (message.role) {
 			case ChatRole.user:
+				if (message.gorevRef != null) {
+					bubble = Column(children: [
+						const Align(
+							alignment: AlignmentDirectional.topEnd,
+							child: Padding(
+								padding: EdgeInsets.only(right: 32, top: 16),
+								child: Text("Görev Yardımı:")
+							)
+						),
+						Row(
+						mainAxisAlignment: MainAxisAlignment.end,
+						children: [
+							Flexible(
+								flex: 1,
+								child: Container()
+							),
+							Flexible(
+								flex: 5,
+								child: TaskCard(message.gorevRef!, (){})
+							),
+						])
+					]);
+					break;
+				}
 				bubble = BubbleNormal(
 				text: message.data ?? "",
 				isSender: true,
@@ -47,7 +72,6 @@ Widget bubble;
 								Uri.parse("https://google.com/search?q=${Uri.encodeFull(message.data!)}"),
 								mode: LaunchMode.externalNonBrowserApplication
 							);
-							print("launch");
 						},
 					child: BubbleNormal(
 						isSender: false,
@@ -74,7 +98,8 @@ Widget bubble;
 		}
 		return Padding(
 			padding: const EdgeInsets.all(4),
-			child: bubble
+
+			child: bubble,
 		);
   }
 }

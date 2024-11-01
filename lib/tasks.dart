@@ -73,7 +73,8 @@ class TaskCardDialog extends StatefulWidget {
 
 	final Task card;
 	final Function onComplete;
-
+	
+	@override
   State<TaskCardDialog> createState() => _TaskCardDialogState();
 }
 
@@ -267,7 +268,7 @@ class _TaskCardDialogState extends State<TaskCardDialog> with SingleTickerProvid
 									foregroundColor: Theme.of(context).colorScheme.onPrimary
 								),
 								onPressed: (){
-									// TODO: Yardım iste -> Görevsiz mesaj
+									data.taskHelp(widget.card, null);
 									Navigator.pop(context);
 								},
 								label: const Padding(

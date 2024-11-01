@@ -2,6 +2,7 @@ import 'dart:math';
 import 'package:ati/data.dart';
 import 'package:ati/main.dart';
 import 'package:ati/onboarding.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:toastification/toastification.dart';
 
@@ -72,7 +73,27 @@ class _UserProfileState extends State<UserProfile> {
 				const SizedBox(height: 16),
 				SettingsRow(
 					name: "Kullanıcı Bilgileri",
-					onTap: (){},
+					onTap: (){
+						Navigator.push(
+							context,
+							MaterialPageRoute(
+								builder: (c) =>Scaffold(
+									appBar: AppBar(title: const Text("Kullanıcı Bilgileri"),),
+									body: ListView(
+										children: const [
+											Padding(
+												padding: EdgeInsets.symmetric(vertical: 12, horizontal: 36),
+												child: SizedBox(
+													height: 300,
+													child: AgePicker(autoSave: true,)
+												)
+											)
+										],
+									)
+								)
+							)
+						);
+					},
 					iconData: Icons.person,
 				),
 				SettingsRow(
@@ -249,6 +270,37 @@ class SettingsList extends StatelessWidget {
 					child: Padding(
 						padding: const EdgeInsets.all(16).copyWith(top: 32),
 						child: ListView(children: children)
+					)
+				)
+			)
+		);
+  }
+}
+
+class AgePicker extends StatelessWidget {
+  const AgePicker({this.autoSave, super.key});
+
+	final bool? autoSave;
+
+  @override
+  Widget build(BuildContext context) {
+    return CupertinoPicker(
+			itemExtent: 48,
+			scrollController: FixedExtentScrollController(initialItem: data.user.age),
+			onSelectedItemChanged: (value) {
+				data.user.age = value;
+				if (autoSave == true) {
+					saveData();
+				}
+			},
+			children: List.generate(
+				100,
+				(index) => Center(
+					child: Text(
+						(index == 0) ?
+						"Belirtmek İstemiyorum" :
+						"$index",
+						style: const TextStyle(fontSize: 18),
 					)
 				)
 			)
