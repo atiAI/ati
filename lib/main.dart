@@ -287,7 +287,6 @@ class HomeGreet extends StatelessWidget {
 							),
 							const SizedBox(height: 16),
 							SizedBox(
-								height: 64,
 								width: 350,
 								child: SearchBox(
 									onSubmitted: (s){
@@ -324,59 +323,52 @@ class _SearchBoxState extends State<SearchBox> {
 		controller = widget.controller ?? TextEditingController();
 	}
 
+	onSubmitted(String s) {
+		if (controller.text.trim().isNotEmpty){
+			controller.clear();
+			widget.onSubmitted(s.trim());
+		}
+	}
+
   @override
   Widget build(BuildContext context) {
-    return Expanded(
-			child: ClipRRect(
-				borderRadius: BorderRadius.circular(16),
-				child: BackdropFilter(
-					filter: ImageFilter.blur(sigmaY: 4, sigmaX: 4),
-					child: Container(
-						color: Theme.of(context).colorScheme.secondary.withOpacity(0.5),
-						child: Padding(
-							padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
-							child: Row(
-								children: [
-									Expanded(
-										child: ClipRRect(
-											borderRadius: BorderRadius.circular(0),
-											child:TextField(
-												controller: controller,
-												onSubmitted: controller.text.isNotEmpty ? widget.onSubmitted : null,
-												onChanged: (s)=>setState((){}),
-												style: TextStyle(
-													fontSize: 16,
-													color: Theme.of(context).colorScheme.onSecondary,
-												),
-												decoration: InputDecoration(
-													icon: AnimatedSize(
-													duration: const Duration(milliseconds: 100),
-													child: Image.asset(
-														"assets/images/smallA.png",
-														color: Colors.white38,
-														height: controller.text.isEmpty ? 32 : 0 
-													)
-													),
-													suffixIcon: InkWell(
-														onTap: ()=>widget.onSubmitted(controller.text),
-														child: Icon(Icons.send, size: controller.text.isEmpty ? 0 : 26)
-													),
-													fillColor: Theme.of(context).colorScheme.secondary.withOpacity(0.8),
-													filled: true,
-													hintText: "ACİL TextField teması lazım",
-													hintStyle: TextStyle(
-														color: Theme.of(context).colorScheme.onSecondary.withOpacity(0.54),
-														fontSize: 14
-													),
-												),
-											),
-										)
-									)
-								]),
+		return 
+		Padding(
+		padding: const EdgeInsets.all(8),
+
+		child: ClipRRect(
+			borderRadius: BorderRadius.circular(12),
+			child: BackdropFilter(
+				filter: ImageFilter.blur(sigmaX: 4, sigmaY: 4),
+				child: Material(
+				color: Theme.of(context).appBarTheme.backgroundColor?.withOpacity(0.5),
+				child: Padding(
+				padding: const EdgeInsets.all(8),
+				child: TextField(
+					decoration: InputDecoration(
+						fillColor: Colors.transparent,
+						filled: true,
+						hintText: "Ati'ye sor",
+						hintStyle: TextStyle(
+							color: Theme.of(context)
+								.colorScheme.onSurface.withOpacity(0.5)
+						),
+						suffixIcon: IconButton(
+							onPressed: (){
+								setState(() {
+									onSubmitted(controller.text);
+								});
+							},
+							icon: const Icon(Icons.send)
 						)
-					)
+					),
+					onSubmitted: onSubmitted,
+					controller: controller,
+				),
+				)
 				)
 			)
-		);
+		)
+	);
   }
 }

@@ -4,6 +4,8 @@ import 'package:chat_bubbles/chat_bubbles.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:shimmer/shimmer.dart';
+import 'package:toastification/toastification.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class ChatMessageWidget extends StatelessWidget {
   const ChatMessageWidget({required this.message, super.key});
@@ -35,6 +37,28 @@ Widget bubble;
 							color: Theme.of(context).colorScheme.secondary,
 							textStyle: TextStyle(color: Theme.of(context).colorScheme.onSecondary),
 						),
+					);
+				}
+				else if (message.arama == true) {
+					bubble = 
+					GestureDetector(
+						onTap: (){
+							launchUrl(
+								Uri.parse("https://google.com/search?q=${Uri.encodeFull(message.data!)}"),
+								mode: LaunchMode.externalNonBrowserApplication
+							);
+							print("launch");
+						},
+					child: BubbleNormal(
+						isSender: false,
+						text: "Google'da ara: ${message.data}",
+						tail: message.tail ?? false,
+						color: Theme.of(context).colorScheme.secondary,
+						textStyle: TextStyle(
+							color: Theme.of(context).colorScheme.onSecondary,
+							decorationStyle: TextDecorationStyle.wavy,
+						),
+					)
 					);
 				}
 				else {
@@ -73,7 +97,8 @@ class _ChatPageState extends State<ChatPage> with AutomaticKeepAliveClientMixin{
 	void initState() {
 		super.initState();
 		SchedulerBinding.instance.addPostFrameCallback((_){
-			scrollController.jumpTo(scrollController.position.maxScrollExtent);
+			//scrollController.jumpTo(scrollController.position.maxScrollExtent);
+			// FIXME: scroll down
 		});
 	}
 
@@ -86,16 +111,14 @@ class _ChatPageState extends State<ChatPage> with AutomaticKeepAliveClientMixin{
 				ListenableBuilder(
 					listenable: data,
 					builder: (context, child) => data.messages.isNotEmpty ?
-						Expanded(
-							child:ListView(
-								children: [
-									...data.messages.map<Widget>(
-										(msg) => ChatMessageWidget(message: msg)
-									),
-									const SizedBox(height: 72)
-								]
-							),
-						) :
+						ListView(
+							children: [
+								...data.messages.map<Widget>(
+									(msg) => ChatMessageWidget(message: msg)
+								),
+								const SizedBox(height: 72)
+							]
+						)	:
 						Center(
 							child: Column(
 								mainAxisSize: MainAxisSize.min,

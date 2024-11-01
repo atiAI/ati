@@ -25,7 +25,7 @@ void loadData() {
 class Data extends ChangeNotifier {
   final List<ChatMessage> _messages;
   final List<Task> _tasks;
-  final User _user;
+  User _user;
 	ThemeMode _themeMode;
 
   Data.fromJson(Map<String, dynamic> json)
@@ -103,15 +103,18 @@ class Data extends ChangeNotifier {
 				description: response.aciklama
 			));
 		}
-		messages.add(ChatMessage(
-			data: "${min(kMaxGorev, response.gorevler.length)} yeni görev eklendi.",
-			role: ChatRole.bot,
-			timeStamp: DateTime.now()
-		));
+		if (response.gorevler.isNotEmpty) {
+			messages.add(ChatMessage(
+				data: "${min(kMaxGorev, response.gorevler.length)} yeni görev eklendi.",
+				role: ChatRole.bot,
+				timeStamp: DateTime.now()
+			));
+		}
 
 		if (response.arama != null) {
 			messages.add(ChatMessage(
-				data: "Google'da ara: ${response.arama}",
+				data: response.arama,
+				arama: true,
 				role: ChatRole.bot,
 				timeStamp: DateTime.now()
 			));
@@ -147,6 +150,14 @@ class Data extends ChangeNotifier {
 		_themeMode = mode;
 		notifyListeners();
 	}
+
+	void clear() {
+		_user = User.empty;
+		_messages.clear();
+		_tasks.clear();
+		_themeMode = ThemeMode.dark;
+		notifyListeners();
+	}
 }
 
 class ChatMessage {
@@ -154,20 +165,23 @@ class ChatMessage {
   final ChatRole role;
   final DateTime timeStamp;
 	bool? tail;
+	final bool? arama;
 
-	ChatMessage({this.data, required this.role, required this.timeStamp, this.tail});
+	ChatMessage({this.data, required this.role, required this.timeStamp, this.tail, this.arama});
 
   ChatMessage.fromJson(Map<String, dynamic> json)
       : data = json["data"] ?? '',
         role = ChatRole.values.elementAt(json["role"] ?? 0),
         timeStamp = DateTime.fromMillisecondsSinceEpoch(json["timeStamp"] ?? 0),
-				tail = json["tail"];
+				tail = json["tail"] ?? false,
+				arama = json["arama"] ?? false;
 
   Map<String, dynamic> toJson() => {
         "data": data,
         "role": role.index,
         "timeStamp": timeStamp.millisecondsSinceEpoch,
 				"tail": tail ?? false,
+				"arama": arama ?? false,
       };
 }
 

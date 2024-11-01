@@ -110,7 +110,7 @@ class _UserProfileState extends State<UserProfile> {
 												foregroundColor: Theme.of(context).colorScheme.onPrimary
 											),
 											onPressed: (){
-												data = Data.clean();
+												data.clear();
 												saveData();
 
 												prefs.setBool("initialized", false);
@@ -118,7 +118,7 @@ class _UserProfileState extends State<UserProfile> {
 												Navigator.pushNamedAndRemoveUntil(
 													context,
 													"onboarding",
-													(r) => false,
+													(r) => r.isFirst,
 												);
 											},
 											label: const Text("Kullanıcı verisini sıfırla"),
