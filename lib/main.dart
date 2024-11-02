@@ -367,7 +367,7 @@ class _SearchBoxState extends State<SearchBox> {
 									onSubmitted(controller.text);
 								});
 							},
-							icon: const Icon(Icons.send)
+							icon: const Icon(Icons.chevron_right)
 						)
 					),
 					onSubmitted: onSubmitted,
