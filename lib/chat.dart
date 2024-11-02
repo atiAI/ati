@@ -134,26 +134,37 @@ class ChatMessageWidget extends StatelessWidget {
 					);
 				}
 				else if (message.arama == true) {
-					bubble = 
-					InkWell(
-					child: BubbleNormal(
-						onTap: (){
-							launchUrl(
-								Uri.parse("https://google.com/search?q=${Uri.encodeFull(message.data!)}"),
-							);
-						},
-						constraints: getMessageConstraints(context),
-						isSender: false,
-						text: "Google'da ara: ${message.data}",
-						tail: message.tail ?? false,
-						color: Theme.of(context).colorScheme.secondary,
-						textStyle: TextStyle(
-							color: Theme.of(context).colorScheme.onSecondary,
-							decorationStyle: TextDecorationStyle.wavy,
-						),
-					)
-					);
-				}
+  bubble = Align(
+    alignment: Alignment.centerLeft,
+    child: Padding(
+      padding: const EdgeInsets.only(left: 18),
+      child: ElevatedButton.icon(
+        onPressed: () {
+          launchUrl(
+            Uri.parse("https://google.com/search?q=${Uri.encodeFull(message.data!)}"),
+          );
+        },
+        style: ElevatedButton.styleFrom(
+          backgroundColor: Colors.blue,
+          foregroundColor: Colors.white,
+          elevation: 6,
+          shadowColor: Colors.black.withOpacity(0.4),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(50),
+          ),
+          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+        ),
+        label: const Text("Google'da Ara"),
+        icon: const Icon(Icons.explore),
+      ),
+    ),
+  );
+}
+
+
+
+
+
 				else {
 					bubble = BubbleNormal(
 						constraints: getMessageConstraints(context),
