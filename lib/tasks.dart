@@ -2,6 +2,7 @@ import 'dart:math';
 
 import 'package:ati/data.dart';
 import 'package:ati/gemini.dart';
+import 'package:ati/main.dart';
 import 'package:flutter/material.dart';
 
 const kMinGorev = 1;
@@ -273,6 +274,9 @@ class _TaskCardDialogState extends State<TaskCardDialog> with SingleTickerProvid
 								onPressed: (){
 									data.taskHelp(widget.card, null);
 									Navigator.pop(context);
+									homePageController.animateTo(
+										0, duration: Durations.short4, curve: Curves.ease);
+										currentPage.value = 0;
 								},
 								label: const Padding(
 									padding: EdgeInsets.symmetric(vertical: 8),

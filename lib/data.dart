@@ -5,6 +5,7 @@ import 'package:ati/gemini.dart';
 import 'package:ati/main.dart';
 import 'package:ati/tasks.dart';
 import 'package:flutter/material.dart';
+import 'package:toastification/toastification.dart';
 
 const kSimulatedDelay = Duration(milliseconds: 500);
 
@@ -111,6 +112,21 @@ class Data extends ChangeNotifier {
 				timeStamp: DateTime.now()
 			));
 		}
+
+		toastification.show(
+			type: ToastificationType.info,
+			title: Text("${min(kMaxGorev, response.gorevler.length)} yeni görev."),
+			description: Text("${response.konu} hakkında."),
+			autoCloseDuration: const Duration(seconds: 3),
+			closeOnClick: true,
+			callbacks: ToastificationCallbacks(
+				onTap: (_){
+					homePageController.animateToPage(
+						2, duration: Durations.short4, curve: Curves.ease
+					);
+				}
+			),
+		);
 
 		if (response.arama != null) {
 			messages.add(ChatMessage(

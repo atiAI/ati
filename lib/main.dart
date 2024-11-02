@@ -11,6 +11,9 @@ import './profile.dart';
 
 late SharedPreferences prefs;
 
+ValueNotifier<int> currentPage = ValueNotifier(1);
+final homePageController = PageController(initialPage: 1);
+
 void main() async {
   runApp(const ToastificationWrapper(
 		config: ToastificationConfig(
@@ -121,9 +124,7 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-	int currentPage = 1;
 
-	final pageController = PageController(initialPage: 1);
 
   @override
   Widget build(BuildContext context) {
@@ -186,11 +187,11 @@ class _HomeScreenState extends State<HomeScreen> {
 						label: "Görevler"
 					),
 				],
-				selectedIndex: currentPage,
+				selectedIndex: currentPage.value,
 				onDestinationSelected: (value){
 					setState((){
-						currentPage = value;
-						pageController.animateToPage(
+						currentPage.value = value;
+						homePageController.animateToPage(
 							value,
 							duration: const Duration(milliseconds: 150),
 							curve: Curves.easeInOut
@@ -199,29 +200,35 @@ class _HomeScreenState extends State<HomeScreen> {
 				},
 			),
 			body: 
+				ListenableBuilder(
+				listenable: currentPage, 
+				builder: (context, _) =>
 				PageView(
-					controller: pageController,
+					controller: homePageController,
 					onPageChanged: (index) => setState(() {
-														currentPage = index;
+														currentPage.value = index;
 													}),
 					children: [
-						const ChatPage(),
-						Stack(children: [
+						const ChatPage(
+							key: PageStorageKey("chatPage"),
+						),
 						HomeGreet(
 							key: const PageStorageKey("homePage"),
 							changePage: setPage
 						),
-						]),
-						const TasksPage(key: PageStorageKey("tasksPage")),
+						const TasksPage(
+							key: PageStorageKey("tasksPage"),
+						),
 					],
+					)
 				),
     );
   }
 
 	setPage(int page){
 		setState(() {
-			currentPage = page;
-			pageController.animateToPage(
+			currentPage.value = page;
+			homePageController.animateToPage(
 				page,
 				duration: const Duration(milliseconds: 150),
 				curve: Curves.easeInOut
