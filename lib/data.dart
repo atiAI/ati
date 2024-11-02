@@ -82,10 +82,23 @@ class Data extends ChangeNotifier {
 		);
 
 		notifyListeners();
+		final AtiResponse response;
+		try{
+			final gcResponse = await AtiGemini.askGeneric(prompt);
+			final String text = gcResponse?.text ?? "{}";
+			response = AtiResponse.fromJson(jsonDecode(text));
+		} catch(e){
+			messages.removeLast();
+			messages.add(ChatMessage(
+				data: e.toString(),
+				error: true,
+				role: ChatRole.bot,
+				timeStamp: DateTime.now()
+			));
+			notifyListeners();
+			return;
+		}
 
-		final gcResponse = await AtiGemini.askGeneric(prompt);
-		final String text = gcResponse?.text ?? "{}";
-		final AtiResponse response = AtiResponse.fromJson(jsonDecode(text));
 
 		messages.removeLast();
 		
@@ -260,8 +273,9 @@ class ChatMessage {
 	final Task? gorevRef;
 	final bool? suggestion;
 	final bool? blockSuggest;
+	final bool? error;
 
-	ChatMessage({this.data, required this.role, required this.timeStamp, this.tail, this.arama, this.gorevRef, this.suggestion, this.blockSuggest});
+	ChatMessage({this.data, required this.role, required this.timeStamp, this.tail, this.arama, this.gorevRef, this.suggestion, this.blockSuggest, this.error});
 
   ChatMessage.fromJson(Map<String, dynamic> json)
       : data = json["data"] ?? '',
@@ -271,7 +285,8 @@ class ChatMessage {
 				arama = json["arama"] ?? false,
 				gorevRef = json["gorevRef"] != null ? Task.fromJson(json["gorevRef"]) : null,
 				suggestion = json["suggestion"] ?? false,
-				blockSuggest = json["blockSuggest"] ?? false;
+				blockSuggest = json["blockSuggest"] ?? false,
+				error = json["error"] ?? false;
 
   Map<String, dynamic> toJson() => {
         "data": data,
@@ -282,6 +297,7 @@ class ChatMessage {
 				"gorevRef": gorevRef?.toJson(),
 				"suggestion": suggestion ?? false,
 				"blockSuggest": blockSuggest ?? false,
+				"error": error ?? false,
       };
 }
 

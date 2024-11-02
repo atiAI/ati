@@ -86,6 +86,14 @@ class ChatMessageWidget extends StatelessWidget {
 						),
 					);
 				}
+				else if (message.error == true) {
+					bubble = BubbleNormal(
+						text: "HATA: ${message.data}", 
+						isSender: false,
+						color: Theme.of(context).colorScheme.error,
+						textStyle: TextStyle(color: Theme.of(context).colorScheme.onError),
+					);
+				}
 				else if (message.suggestion == true) {
 					List<String> sorular = (jsonDecode(message.data!)["sorular"] as List).map<String>((s)=>s.toString()).toList();
 					bubble =
