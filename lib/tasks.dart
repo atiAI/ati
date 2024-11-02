@@ -24,12 +24,13 @@ class _TaskCardState extends State<TaskCard> {
 			padding: const EdgeInsets.symmetric(
 				horizontal: 30, vertical: 14
 			),
-			child: InkWell(
-				onTap: () => showCardDetails(context, widget.gorev, widget.onComplete),
-				child: ClipRRect(
-					borderRadius: BorderRadius.circular(8),
-					child: Container(
-						color: Theme.of(context).colorScheme.primary,
+			child: ClipRRect(
+				borderRadius: BorderRadius.circular(8),
+				child: Material(
+					color: Theme.of(context).colorScheme.primary,
+					child: InkWell(
+						hoverColor: Theme.of(context).colorScheme.onPrimary.withOpacity(0.1),
+						onTap: () => showCardDetails(context, widget.gorev, widget.onComplete),
 						child: Padding(
 							padding: const EdgeInsets.only(
 								left: 16, right: 16, top: 14, bottom: 22),
@@ -182,7 +183,8 @@ class _TaskCardDialogState extends State<TaskCardDialog> with SingleTickerProvid
 								style: ElevatedButton.styleFrom(
 									textStyle: const TextStyle(fontSize: 18),
 									backgroundColor: Theme.of(context).colorScheme.secondary,
-									foregroundColor: Theme.of(context).colorScheme.onSecondary
+									foregroundColor: Theme.of(context).colorScheme.onSecondary,
+									iconColor: Theme.of(context).colorScheme.onSecondary,
 								),
 								onPressed: (){
 									widget.onComplete();
@@ -265,7 +267,8 @@ class _TaskCardDialogState extends State<TaskCardDialog> with SingleTickerProvid
 								style: ElevatedButton.styleFrom(
 									textStyle: const TextStyle(fontSize: 18),
 									backgroundColor: Theme.of(context).colorScheme.primary,
-									foregroundColor: Theme.of(context).colorScheme.onPrimary
+									foregroundColor: Theme.of(context).colorScheme.onPrimary,
+									iconColor: Theme.of(context).colorScheme.onPrimary,
 								),
 								onPressed: (){
 									data.taskHelp(widget.card, null);
@@ -300,10 +303,7 @@ class _TasksPageState extends State<TasksPage> {
   @override
   Widget build(BuildContext context) {
     return
-		Row(
-			children: [
-				Expanded(
-					child: ListView.builder(	
+				ListView.builder(
 						itemBuilder: (context, index) => TaskCard(
 							data.tasks[index], 
 							() => setState(() {
@@ -314,10 +314,7 @@ class _TasksPageState extends State<TasksPage> {
 						),
 						itemCount: data.tasks.length,
 						scrollDirection: Axis.vertical,
-					)
-				)
-			]
-		);
+				);
   }
 }
 

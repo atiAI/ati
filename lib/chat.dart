@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:ati/data.dart';
 import 'package:ati/main.dart';
 import 'package:ati/tasks.dart';
@@ -5,8 +7,10 @@ import 'package:chat_bubbles/chat_bubbles.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:shimmer/shimmer.dart';
-import 'package:toastification/toastification.dart';
 import 'package:url_launcher/url_launcher.dart';
+
+BoxConstraints getMessageConstraints(BuildContext context) =>
+	BoxConstraints(maxWidth: min(700, MediaQuery.of(context).size.width * 0.8));
 
 class ChatMessageWidget extends StatelessWidget {
   const ChatMessageWidget({required this.message, super.key});
@@ -43,6 +47,7 @@ class ChatMessageWidget extends StatelessWidget {
 					break;
 				}
 				bubble = BubbleNormal(
+				constraints: getMessageConstraints(context),
 				text: message.data ?? "",
 				isSender: true,
 				color: Theme.of(context).colorScheme.primary,
@@ -56,6 +61,7 @@ class ChatMessageWidget extends StatelessWidget {
 						baseColor: Theme.of(context).colorScheme.secondary,
 						highlightColor: Theme.of(context).colorScheme.tertiary,
 						child: BubbleNormal(
+							constraints: getMessageConstraints(context),
 							isSender: false,
 							text: "Ati yazıyor...",
 							tail: message.tail ?? false,
@@ -66,7 +72,7 @@ class ChatMessageWidget extends StatelessWidget {
 				}
 				else if (message.arama == true) {
 					bubble = 
-					GestureDetector(
+					InkWell(
 						onTap: (){
 							launchUrl(
 								Uri.parse("https://google.com/search?q=${Uri.encodeFull(message.data!)}"),
@@ -74,6 +80,7 @@ class ChatMessageWidget extends StatelessWidget {
 							);
 						},
 					child: BubbleNormal(
+						constraints: getMessageConstraints(context),
 						isSender: false,
 						text: "Google'da ara: ${message.data}",
 						tail: message.tail ?? false,
@@ -87,6 +94,7 @@ class ChatMessageWidget extends StatelessWidget {
 				}
 				else {
 					bubble = BubbleNormal(
+						constraints: getMessageConstraints(context),
 						isSender: false,
 						text: message.data!,
 						tail: message.tail ?? false,
@@ -98,7 +106,6 @@ class ChatMessageWidget extends StatelessWidget {
 		}
 		return Padding(
 			padding: const EdgeInsets.all(4),
-
 			child: bubble,
 		);
   }
@@ -136,14 +143,16 @@ class _ChatPageState extends State<ChatPage> with AutomaticKeepAliveClientMixin{
 				ListenableBuilder(
 					listenable: data,
 					builder: (context, child) => data.messages.isNotEmpty ?
-						ListView(
-							children: [
-								...data.messages.map<Widget>(
-									(msg) => ChatMessageWidget(message: msg)
-								),
-								const SizedBox(height: 72)
-							]
-						)	:
+						Center(
+								child: ListView(
+									children: [
+										...data.messages.map<Widget>(
+											(msg) => ChatMessageWidget(message: msg)
+										),
+										const SizedBox(height: 72)
+									]
+								)
+						):
 						Center(
 							child: Column(
 								mainAxisSize: MainAxisSize.min,

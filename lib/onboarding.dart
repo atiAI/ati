@@ -1,7 +1,6 @@
 import 'package:ati/data.dart';
 import 'package:ati/main.dart';
 import 'package:ati/profile.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:visibility_detector/visibility_detector.dart';
 
@@ -62,15 +61,28 @@ class _OnboardingState extends State<Onboarding> {
 				title: "Yaşın?",
 				content: AgePicker()
 			),
-			const OnboardingPage(
+			OnboardingPage(
 				title: "Görünüş",
-				content: Row(
+				content: 
+				MediaQuery.sizeOf(context).width > 600 ?
+				const Row(
 					children: [
 						ThemeButton(ThemeMode.light, Icons.light_mode, "Açık"),
 						ThemeButton(ThemeMode.system, Icons.brightness_4, "Sistem"),
 						ThemeButton(ThemeMode.dark, Icons.dark_mode, "Koyu")
 					]
-				),
+				) : 
+				const Column(
+				crossAxisAlignment: CrossAxisAlignment.start,
+				children: [
+					Row(
+						children: [
+							ThemeButton(ThemeMode.light, Icons.light_mode, "Açık"),
+							ThemeButton(ThemeMode.dark, Icons.dark_mode, "Koyu")
+						]
+					),
+						ThemeButton(ThemeMode.system, Icons.brightness_4, "Sistem"),
+				])
 			),
       OnboardingPage(
         title: "Tamamdır!",
@@ -245,11 +257,19 @@ class OnboardingPage extends StatelessWidget {
     return Container(
       color: color,
       child: Padding(
-        padding: const EdgeInsets.only(
+        padding: 
+				MediaQuery.sizeOf(context).width > 500 ?
+				const EdgeInsets.only(
           top: 180,
 					bottom: 160,
           left: 112,
           right: 96,
+        ) :
+				const EdgeInsets.only(
+          top: 180,
+					bottom: 160,
+          left: 50,
+          right: 30,
         ),
         child: Column(
 					crossAxisAlignment: CrossAxisAlignment.start,

@@ -29,8 +29,6 @@ const Map<Brightness, Color> logoTints = {
 
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
-
-  // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
     return ListenableBuilder(
@@ -63,12 +61,13 @@ class MyApp extends StatelessWidget {
 				dialogTheme: const DialogTheme(
 					titleTextStyle: TextStyle(
 						fontWeight: FontWeight.bold,
-						color: Colors.black,
+						color: Colors.white,
 						fontSize: 28,
 					),
 					contentTextStyle: TextStyle(
 						fontWeight: FontWeight.normal,
-						color: Colors.black,
+						color: Colors.white,
+						fontSize: 16,
 					)
 				),
       ),
@@ -207,10 +206,12 @@ class _HomeScreenState extends State<HomeScreen> {
 													}),
 					children: [
 						const ChatPage(),
+						Stack(children: [
 						HomeGreet(
 							key: const PageStorageKey("homePage"),
 							changePage: setPage
 						),
+						]),
 						const TasksPage(key: PageStorageKey("tasksPage")),
 					],
 				),
