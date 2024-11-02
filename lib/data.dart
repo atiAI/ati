@@ -111,22 +111,22 @@ class Data extends ChangeNotifier {
 				role: ChatRole.bot,
 				timeStamp: DateTime.now()
 			));
+			toastification.show(
+				type: ToastificationType.info,
+				title: Text("${min(kMaxGorev, response.gorevler.length)} yeni görev."),
+				description: Text("${response.konu} hakkında."),
+				autoCloseDuration: const Duration(seconds: 3),
+				closeOnClick: true,
+				callbacks: ToastificationCallbacks(
+					onTap: (_){
+						homePageController.animateToPage(
+							2, duration: Durations.short4, curve: Curves.ease
+						);
+					}
+				),
+			);
 		}
 
-		toastification.show(
-			type: ToastificationType.info,
-			title: Text("${min(kMaxGorev, response.gorevler.length)} yeni görev."),
-			description: Text("${response.konu} hakkında."),
-			autoCloseDuration: const Duration(seconds: 3),
-			closeOnClick: true,
-			callbacks: ToastificationCallbacks(
-				onTap: (_){
-					homePageController.animateToPage(
-						2, duration: Durations.short4, curve: Curves.ease
-					);
-				}
-			),
-		);
 
 		if (response.arama != null) {
 			messages.add(ChatMessage(

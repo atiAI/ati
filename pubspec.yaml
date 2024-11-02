@@ -42,11 +42,9 @@ dependencies:
   shimmer: ^3.0.0
   visibility_detector: ^0.4.0+2
   url_launcher: ^6.3.1
+  flutter_native_splash: ^2.4.2
 
 dev_dependencies:
-  flutter_test:
-    sdk: flutter
-
   # The "flutter_lints" package below contains a set of recommended lints to
   # encourage good coding practices. The lint set provided by the package is
   # activated in the `analysis_options.yaml` file located at the root of your
@@ -69,6 +67,9 @@ flutter_launcher_icons:
     generate: true
   image_path: "assets/images/icon.png"
 
+flutter_native_splash:
+  color: "#00001e"
+  image: "assets/images/splash.png"
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec
