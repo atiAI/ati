@@ -184,6 +184,41 @@ class Data extends ChangeNotifier {
 		saveData();
 	}
 
+	Future generateQuestions(String initial) async {
+		messages.add(ChatMessage(
+			role: ChatRole.user,
+			timeStamp: DateTime.now(),
+			data: "Soruyu geliştir: $initial",
+			blockSuggest: true,
+			tail: true
+		));
+
+		notifyListeners();
+
+		await Future.delayed(kSimulatedDelay);
+		messages.add(ChatMessage(
+			role: ChatRole.bot,
+			tail: true,
+			data: null,
+			timeStamp: DateTime.now(),
+		));
+
+		notifyListeners();
+
+		final suggestion = await AtiGemini.askQuestionSuggestions(initial);
+
+		messages.removeLast();
+
+		messages.add(ChatMessage(
+			data: suggestion?.text,
+			suggestion: true,
+			timeStamp: DateTime.now(),
+			role: ChatRole.bot
+		));
+
+		notifyListeners();
+	}
+
   void addTask(Task task) {
     _tasks.add(task);
     notifyListeners();
@@ -223,8 +258,10 @@ class ChatMessage {
 	bool? tail;
 	final bool? arama;
 	final Task? gorevRef;
+	final bool? suggestion;
+	final bool? blockSuggest;
 
-	ChatMessage({this.data, required this.role, required this.timeStamp, this.tail, this.arama, this.gorevRef});
+	ChatMessage({this.data, required this.role, required this.timeStamp, this.tail, this.arama, this.gorevRef, this.suggestion, this.blockSuggest});
 
   ChatMessage.fromJson(Map<String, dynamic> json)
       : data = json["data"] ?? '',
@@ -232,7 +269,9 @@ class ChatMessage {
         timeStamp = DateTime.fromMillisecondsSinceEpoch(json["timeStamp"] ?? 0),
 				tail = json["tail"] ?? false,
 				arama = json["arama"] ?? false,
-				gorevRef = json["gorevRef"] != null ? Task.fromJson(json["gorevRef"]) : null;
+				gorevRef = json["gorevRef"] != null ? Task.fromJson(json["gorevRef"]) : null,
+				suggestion = json["suggestion"] ?? false,
+				blockSuggest = json["blockSuggest"] ?? false;
 
   Map<String, dynamic> toJson() => {
         "data": data,
@@ -241,6 +280,8 @@ class ChatMessage {
 				"tail": tail ?? false,
 				"arama": arama ?? false,
 				"gorevRef": gorevRef?.toJson(),
+				"suggestion": suggestion ?? false,
+				"blockSuggest": blockSuggest ?? false,
       };
 }
 

@@ -1,9 +1,13 @@
+import 'dart:convert';
+
 import 'package:ati/data.dart';
 import 'package:ati/main.dart';
 import 'package:ati/tasks.dart';
 import 'package:flutter/material.dart';
 import 'package:google_generative_ai/google_generative_ai.dart';
 import 'package:toastification/toastification.dart';
+
+const kSuggestQuestionCount = 3;
 
 String get atiBaseSP => 
 			'Ati adında eğitsel bir yapay zekasın.'
@@ -24,9 +28,14 @@ const String atiGeneralQuestionSP =
 			'- Konuyu daha çok anlamak için gerekecek Google aramasını arama\'ya yaz.\n';
 
 const String atiTaskHelpSP =
-			'- Kullanıcıya verdiğin görevi yerine getirmesi için yardımcı olacaksın.'
-			'- Kullanıcı görev hakkında kesin bir soru sorduysa sorduğu soruyu cevapla.'
-			'- Kullanıcı görev hakkında belli bir soru sormadıysa görevi tamamlaması için gereken adımları anlat.';
+			'- Kullanıcıya verdiğin görevi yerine getirmesi için yardımcı olacaksın.\n'
+			'- Kullanıcı görev hakkında kesin bir soru sorduysa sorduğu soruyu cevapla.\n'
+			'- Kullanıcı görev hakkında belli bir soru sormadıysa görevi tamamlaması için gereken adımları anlat.\n';
+
+String get atiQuestionSuggestSP =>
+			'- Kullanıcının sorması için $kSuggestQuestionCount sayıda, kısa, 1 cümlelik yeni soru oluştur.\n'
+			'- Sorular kısmına sadece oluşturduğun soruları yaz. Kullanıcı ile sohbet etme. Konu anlatımı yapma.\n'
+			'- Konuştuğun kişi ${data.user.age} yaşında, ${data.user.name} adında biri.';
 
 const String atiSafetyPrompt = 
 			'- Sadece valid olan soruları cevapla\n'
@@ -134,6 +143,13 @@ class AtiGemini {
 					if (m.gorevRef != null) {
 						return Content("model", [TextPart("Görev yardımı: ${m.gorevRef!.task}")]);
 					}
+					if (m.suggestion == true) {
+						return Content("model", [
+							TextPart("Önerilen sorular:"),
+							...(jsonDecode(m.data!)["sorular"] as List)
+								.map<TextPart>((s)=>TextPart("$s\n"))
+						]);
+					}
 					return Content(m.role.genai, [TextPart(m.data ?? "")]);
 				}
 			).toList()
@@ -176,6 +192,49 @@ class AtiGemini {
 		]);
 
 		return chat.sendMessage(Content.text("Görev yardımı: ${prompt ?? ""}"));
+	}
+
+	static Future<GenerateContentResponse?> askQuestionSuggestions(String initialQuestion) async {
+		var geminiKey = prefs.getString("geminiKey");
+		if (geminiKey == null ) {
+			toastification.show(
+				title: const Text("API Anahtarı bulunamadı"),
+				type: ToastificationType.error,
+			);
+			return null;
+		}
+
+		final model = GenerativeModel(
+			model: 'gemini-1.5-flash',
+			apiKey: geminiKey,
+			generationConfig: GenerationConfig(
+				temperature: 0,
+				topK: 64,
+				topP: 0.95,
+				maxOutputTokens: 8192,
+				responseMimeType: 'application/json',
+				responseSchema: Schema.object(
+					properties: {
+						"sorular": Schema.array(
+							items: Schema.string()
+						)
+					}, 
+					requiredProperties: ["sorular"]
+				)
+			),
+			systemInstruction: Content.system([
+				atiBaseSP,
+				atiQuestionSuggestSP,
+				atiSafetyPrompt,
+			].join("\n"))
+		);
+
+		final chat = model.startChat(history: [
+		]);
+
+		return chat.sendMessage(Content.multi([
+			TextPart(initialQuestion)
+		]));
 	}
 	
 }

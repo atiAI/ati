@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:math';
 
 import 'package:ati/data.dart';
@@ -46,13 +47,28 @@ class ChatMessageWidget extends StatelessWidget {
 					]);
 					break;
 				}
-				bubble = BubbleNormal(
-				constraints: getMessageConstraints(context),
-				text: message.data ?? "",
-				isSender: true,
-				color: Theme.of(context).colorScheme.primary,
-				textStyle: TextStyle(color: Theme.of(context).colorScheme.onPrimary),
-				);
+				bubble = Column(
+				children: [
+				BubbleNormal(
+					constraints: getMessageConstraints(context),
+					text: message.data ?? "",
+					isSender: true,
+					color: Theme.of(context).colorScheme.primary,
+					textStyle: TextStyle(color: Theme.of(context).colorScheme.onPrimary),
+				),
+				(message.blockSuggest == true) ?
+				Container() :
+				Align(
+				alignment: Alignment.centerRight,
+				child: ElevatedButton.icon(
+					onPressed: (){
+						data.generateQuestions(message.data!);
+					},
+					label: const Text("Soruyu geliştir"),
+					icon: const Icon(Icons.menu),
+				)
+				)
+				]);
 				break;
 			case ChatRole.bot:
 				if (message.data == null) {
@@ -68,6 +84,45 @@ class ChatMessageWidget extends StatelessWidget {
 							color: Theme.of(context).colorScheme.secondary,
 							textStyle: TextStyle(color: Theme.of(context).colorScheme.onSecondary),
 						),
+					);
+				}
+				else if (message.suggestion == true) {
+					List<String> sorular = (jsonDecode(message.data!)["sorular"] as List).map<String>((s)=>s.toString()).toList();
+					bubble =
+						Column(
+							crossAxisAlignment: CrossAxisAlignment.start,
+							children:[
+							BubbleNormal(
+								text: "Önerilen sorular:", 
+								isSender: false,
+								color: Theme.of(context).colorScheme.secondary,
+								textStyle: TextStyle(color: Theme.of(context).colorScheme.onSecondary),
+							),
+							Column(
+							crossAxisAlignment: CrossAxisAlignment.start,
+							children: 
+								sorular.map((soru)=>
+									ConstrainedBox(
+										constraints: getMessageConstraints(context),
+										child: Padding(
+											padding: const EdgeInsets.all(8),
+											child: ElevatedButton(
+												onPressed: (){data.sendMessage(soru);},
+												style: ElevatedButton.styleFrom(
+													backgroundColor: Theme.of(context).colorScheme.tertiary,
+													foregroundColor: Theme.of(context).colorScheme.onTertiary
+												),
+												child: Padding(
+													padding: const EdgeInsets.all(8),
+													child: Text(soru)
+												),
+											)
+										)
+									)
+								).toList()
+							)
+							]
+						
 					);
 				}
 				else if (message.arama == true) {
