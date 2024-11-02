@@ -36,7 +36,10 @@ dependencies:
   # Use with the CupertinoIcons class for iOS style icons.
   cupertino_icons: ^1.0.8
   shared_preferences: ^2.3.2
-  chat_bubbles: ^1.6.0
+  chat_bubbles:
+    git:
+      url: "https://github.com/atiAI/chat_bubbles.git"
+      ref: "21671a6d5003d6039fa77979ee1409a2d43d9088"
   toastification: ^2.3.0
   google_generative_ai: ^0.4.6
   shimmer: ^3.0.0

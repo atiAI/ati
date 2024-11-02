@@ -44,10 +44,11 @@ packages:
   chat_bubbles:
     dependency: "direct main"
     description:
-      name: chat_bubbles
-      sha256: "9ee1493b31a7f847363c5d69725ec55db94f720c7c116d403b4d322a4da0f08c"
-      url: "https://pub.dev"
-    source: hosted
+      path: "."
+      ref: "21671a6d5003d6039fa77979ee1409a2d43d9088"
+      resolved-ref: "21671a6d5003d6039fa77979ee1409a2d43d9088"
+      url: "https://github.com/atiAI/chat_bubbles.git"
+    source: git
     version: "1.6.0"
   checked_yaml:
     dependency: transitive

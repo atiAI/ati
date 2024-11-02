@@ -73,13 +73,12 @@ class ChatMessageWidget extends StatelessWidget {
 				else if (message.arama == true) {
 					bubble = 
 					InkWell(
+					child: BubbleNormal(
 						onTap: (){
 							launchUrl(
 								Uri.parse("https://google.com/search?q=${Uri.encodeFull(message.data!)}"),
-								mode: LaunchMode.externalNonBrowserApplication
 							);
 						},
-					child: BubbleNormal(
 						constraints: getMessageConstraints(context),
 						isSender: false,
 						text: "Google'da ara: ${message.data}",
