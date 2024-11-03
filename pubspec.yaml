@@ -92,6 +92,7 @@ flutter:
   #   - images/a_dot_burr.jpeg
   #   - images/a_dot_ham.jpeg
   assets:
+    - assets/images/yuzbirinciyil.png
     - assets/images/yuzuncuyil.png
     - assets/images/user.png
     - assets/images/bigA.png

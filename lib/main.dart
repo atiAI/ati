@@ -170,8 +170,9 @@ class _HomeScreenState extends State<HomeScreen> {
 						)
 					])
 				],
-				leading: Image.asset(
-					"assets/images/yuzuncuyil.png",
+				leading: Padding(
+					padding: const EdgeInsets.only(left: 15, right: 15,),
+					child: Image.asset("assets/images/yuzbirinciyil.png")
 				),
       ),
 			bottomNavigationBar: NavigationBar(
