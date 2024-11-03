@@ -86,6 +86,23 @@ class Data extends ChangeNotifier {
   }
 
 	Future sendMessage(String prompt, File? file) async {
+		if (prompt.startsWith("//")) {
+			switch (prompt) {
+				case "//clearchat":
+					messages.clear();
+					break;
+				case "//cleartasks":
+					tasks.clear();
+					break;
+				case "//clearfiles":
+					files.clear();
+					break;
+			}
+			notifyListeners();
+			saveData();
+			return;
+		}
+
 		messages.add(ChatMessage(
 			data: prompt,
 			role: ChatRole.user,
