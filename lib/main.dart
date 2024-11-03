@@ -1,7 +1,9 @@
+import 'dart:math';
 import 'dart:ui';
 
 import 'package:ati/chat.dart';
 import 'package:ati/data.dart';
+import 'package:ati/files.dart';
 import 'package:ati/onboarding.dart';
 import 'package:ati/tasks.dart';
 import 'package:flutter/material.dart';
@@ -261,10 +263,13 @@ class HomeGreet extends StatelessWidget {
 						)
 					)
 				),
-				Center(
-					child: Column(
-						mainAxisAlignment: MainAxisAlignment.center,
+				SingleChildScrollView(
+					child: Row(
+					mainAxisAlignment: MainAxisAlignment.center,
+					children:[
+					Column(
 						children: [
+							SizedBox(height: MediaQuery.of(context).size.height * 0.3),
 							Container(
 								decoration: BoxDecoration(
 									border: Border(
@@ -295,18 +300,31 @@ class HomeGreet extends StatelessWidget {
 							),
 							const SizedBox(height: 16),
 							SizedBox(
-								width: 350,
+								width: min(350, MediaQuery.sizeOf(context).width * 0.95),
 								child: SearchBox(
 									onSubmitted: (s){
-										data.sendMessage(s);
+										data.sendMessage(s, null);
 										changePage(0);
 									},
 								)
+							),
+							const SizedBox(height: 32),
+							ElevatedButton.icon(
+								onPressed: (){
+									Navigator.push(
+										context,
+										MaterialPageRoute(
+											builder: (context) => const FilesPage()
+										)
+									);
+								},
+								label: const Text("Dosyalarım"),
+								icon: const Icon(Icons.file_open)
 							)
 						]
 					)
-				)
-			]);
+				]))]
+			);
   }
 }
 
@@ -352,7 +370,13 @@ class _SearchBoxState extends State<SearchBox> {
 				color: Theme.of(context).appBarTheme.backgroundColor?.withOpacity(0.5),
 				child: Padding(
 				padding: const EdgeInsets.all(8),
-				child: TextField(
+				child: Row(children: [
+				Padding(
+					padding: const EdgeInsets.all(12),
+					child: Image.asset("assets/images/smallA.png", height: 24,),
+				),
+				Flexible(child: 
+				TextField(
 					decoration: InputDecoration(
 						fillColor: Colors.transparent,
 						filled: true,
@@ -360,6 +384,15 @@ class _SearchBoxState extends State<SearchBox> {
 						hintStyle: TextStyle(
 							color: Theme.of(context)
 								.colorScheme.onSurface.withOpacity(0.5)
+						),
+						prefixIcon: IconButton(
+							onPressed: (){
+								Navigator.push(
+									context,
+									MaterialPageRoute(builder: (context)=> const FilesPage())
+								);
+							},
+							icon: const Icon(Icons.attach_file),
 						),
 						suffixIcon: IconButton(
 							onPressed: (){
@@ -372,7 +405,8 @@ class _SearchBoxState extends State<SearchBox> {
 					),
 					onSubmitted: onSubmitted,
 					controller: controller,
-				),
+				))
+				]),
 				)
 				)
 			)

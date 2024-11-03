@@ -45,6 +45,7 @@
 						util-linux.dev
 						xorg.libXdmcp
 						xorg.libXtst
+						zenity
 					];
 
           # Set any environment variables for your dev shell

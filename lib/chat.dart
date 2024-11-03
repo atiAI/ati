@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:math';
 
 import 'package:ati/data.dart';
+import 'package:ati/files.dart';
 import 'package:ati/main.dart';
 import 'package:ati/tasks.dart';
 import 'package:chat_bubbles/chat_bubbles.dart';
@@ -48,7 +49,44 @@ class ChatMessageWidget extends StatelessWidget {
 					break;
 				}
 				bubble = Column(
+				crossAxisAlignment: CrossAxisAlignment.end,
 				children: [
+				(message.fileRef == null) ?
+				Container():
+				Padding(
+				padding: const EdgeInsets.only(right: 12),
+				child: InkWell(
+				onTap: (){
+					selectedFile.value = message.fileRef;
+				},
+
+				child: Container(
+					constraints: getMessageConstraints(context),
+					padding: const EdgeInsets.all(8),
+					decoration: BoxDecoration(
+						border: Border(
+							right: BorderSide(
+								color: Theme.of(context).colorScheme.onSurface.withOpacity(0.5),
+								width: 2.5,
+							)
+						)
+					),
+					child: Row(
+						mainAxisSize: MainAxisSize.min,
+						children: [
+							const Icon(Icons.insert_drive_file_outlined),
+							const SizedBox(width: 4),
+							Flexible(
+								child: Text(
+									message.fileRef!.path.split("/").last,
+									overflow: TextOverflow.ellipsis,
+								)
+							)
+						]
+					)
+				)
+				)
+				),
 				BubbleNormal(
 					constraints: getMessageConstraints(context),
 					text: message.data ?? "",
@@ -56,7 +94,7 @@ class ChatMessageWidget extends StatelessWidget {
 					color: Theme.of(context).colorScheme.primary,
 					textStyle: TextStyle(color: Theme.of(context).colorScheme.onPrimary),
 				),
-				(message.blockSuggest == true) ?
+				(message.blockSuggest == true) || (message.fileRef != null) ?
 				Container() :
 				Align(
 				alignment: Alignment.centerRight,
@@ -115,7 +153,7 @@ class ChatMessageWidget extends StatelessWidget {
 										child: Padding(
 											padding: const EdgeInsets.all(8),
 											child: ElevatedButton(
-												onPressed: (){data.sendMessage(soru);},
+												onPressed: (){data.sendMessage(soru, null);},
 												style: ElevatedButton.styleFrom(
 													backgroundColor: Theme.of(context).colorScheme.tertiary,
 													foregroundColor: Theme.of(context).colorScheme.onTertiary
@@ -134,37 +172,32 @@ class ChatMessageWidget extends StatelessWidget {
 					);
 				}
 				else if (message.arama == true) {
-  bubble = Align(
-    alignment: Alignment.centerLeft,
-    child: Padding(
-      padding: const EdgeInsets.only(left: 18),
-      child: ElevatedButton.icon(
-        onPressed: () {
-          launchUrl(
-            Uri.parse("https://google.com/search?q=${Uri.encodeFull(message.data!)}"),
-          );
-        },
-        style: ElevatedButton.styleFrom(
-          backgroundColor: Colors.blue,
-          foregroundColor: Colors.white,
-          elevation: 6,
-          shadowColor: Colors.black.withOpacity(0.4),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(50),
-          ),
-          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-        ),
-        label: const Text("Google'da Ara"),
-        icon: const Icon(Icons.explore),
-      ),
-    ),
-  );
-}
-
-
-
-
-
+					bubble = Align(
+						alignment: Alignment.centerLeft,
+						child: Padding(
+							padding: const EdgeInsets.only(left: 18),
+							child: ElevatedButton.icon(
+								onPressed: () {
+									launchUrl(
+										Uri.parse("https://google.com/search?q=${Uri.encodeFull(message.data!)}"),
+									);
+								},
+								style: ElevatedButton.styleFrom(
+									backgroundColor: Colors.blue,
+									foregroundColor: Colors.white,
+									elevation: 6,
+									shadowColor: Colors.black.withOpacity(0.4),
+									shape: RoundedRectangleBorder(
+										borderRadius: BorderRadius.circular(50),
+									),
+									padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+								),
+								label: const Text("Google'da Ara"),
+								icon: const Icon(Icons.explore),
+							),
+						),
+					);
+				}
 				else {
 					bubble = BubbleNormal(
 						constraints: getMessageConstraints(context),
@@ -222,7 +255,13 @@ class _ChatPageState extends State<ChatPage> with AutomaticKeepAliveClientMixin{
 										...data.messages.map<Widget>(
 											(msg) => ChatMessageWidget(message: msg)
 										),
-										const SizedBox(height: 72)
+										ListenableBuilder(
+											listenable: selectedFile,
+											builder: (context, _) => 
+												SizedBox(
+													height: selectedFile.value == null ? 72 : 128
+												)
+										)
 									]
 								)
 						):
@@ -239,21 +278,64 @@ class _ChatPageState extends State<ChatPage> with AutomaticKeepAliveClientMixin{
 												.colorScheme.onSurface.withOpacity(0.7)
 										)
 									),
-									const SizedBox(height: 50,)
+									const SizedBox(height: 50)
 								]
 							)
 						),
 				),
 				Align(
 					alignment: AlignmentDirectional.bottomCenter,
-					child: SearchBox(
-						onSubmitted: (prompt){
-							setState(() {
-								data.sendMessage(prompt);
-								sbController.clear();
-							});
-						},
-					controller: sbController
+					child: ListenableBuilder(
+						listenable: selectedFile, builder: (context, _) =>
+						Column(
+							mainAxisAlignment: MainAxisAlignment.end,
+							children: [
+								(selectedFile.value == null) ?
+								Container():
+								Padding(
+									padding: const EdgeInsets.symmetric(horizontal: 12),
+									child: Container(
+										decoration: BoxDecoration(
+											color: Theme.of(context).appBarTheme.backgroundColor,
+											borderRadius: BorderRadius.circular(12)
+										),
+										child: Padding(
+										padding: const EdgeInsets.all(6),
+										child: Row(
+											mainAxisAlignment: MainAxisAlignment.spaceBetween,
+											children: [
+												Flexible(child: Row(children: [
+													const Icon(Icons.insert_drive_file_outlined),
+													const SizedBox(width: 10),
+													Flexible(
+														child: Text(
+															selectedFile.value!.path.split("/").last,
+															overflow: TextOverflow.ellipsis,
+														)
+													)
+												])),
+												IconButton(
+													onPressed: (){
+														selectedFile.value = null;
+													},
+													icon: const Icon(Icons.close)
+												)
+											])
+										)
+									)
+								),
+								SearchBox(
+									onSubmitted: (prompt){
+										setState(() {
+											data.sendMessage(prompt, selectedFile.value);
+											sbController.clear();
+											selectedFile.value = null;
+										});
+									},
+									controller: sbController
+								)
+							]
+						)
 					)
 				)
 			])

@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:io';
 import 'dart:math';
 
 import 'package:ati/gemini.dart';
@@ -27,6 +28,7 @@ class Data extends ChangeNotifier {
   final List<ChatMessage> _messages;
   final List<Task> _tasks;
   User _user;
+	final List<File> _files;
 	ThemeMode _themeMode;
 
   Data.fromJson(Map<String, dynamic> json)
@@ -37,37 +39,59 @@ class Data extends ChangeNotifier {
             .map((t) => Task.fromJson(t))
             .toList(),
         _user = User.fromJson(json["user"]),
-				_themeMode = ThemeMode.values[json["themeMode"] ?? 2];
+				_themeMode = ThemeMode.values[json["themeMode"] ?? 2],
+				_files = (json["files"] as List? ?? []).
+						map<File>((s) => File(s.toString()))
+						.toList();
 
   Map<String, dynamic> toJson() => {
         "messages": _messages.map((m) => m.toJson()).toList(),
         "tasks": _tasks.map((t) => t.toJson()).toList(),
         "user": _user.toJson(),
 				"themeMode": _themeMode.index,
+				"files": _files.map<String>((f)=>f.path).toList(),
       };
 
 	Data.clean()
 		: _messages = [],
 			_tasks = [],
 			_user = User.empty,
-			_themeMode = ThemeMode.dark;
+			_themeMode = ThemeMode.dark,
+			_files = [];
 
   List<ChatMessage> get messages => _messages;
   List<Task> get tasks => _tasks;
   User get user => _user;
 	ThemeMode get themeMode => _themeMode;
+	List<File> get files => _files;
+
+	void addFile(File file) {
+		_files.add(file);
+		notifyListeners();
+	}
+	
+	void removeFile(File file) {
+		_files.remove(file);
+		notifyListeners();
+	}
+	
+	void removeFileByPath(String path) {
+		_files.removeWhere((f) => f.path == path);
+		notifyListeners();
+	}
 
   void addMessage(ChatMessage message) {
     _messages.add(message);
     notifyListeners();
   }
 
-	Future sendMessage(String prompt) async {
+	Future sendMessage(String prompt, File? file) async {
 		messages.add(ChatMessage(
 			data: prompt,
 			role: ChatRole.user,
 			tail: true,
-			timeStamp: DateTime.now()
+			timeStamp: DateTime.now(),
+			fileRef: file,
 		));
 
 		notifyListeners();
@@ -84,7 +108,7 @@ class Data extends ChangeNotifier {
 		notifyListeners();
 		final AtiResponse response;
 		try{
-			final gcResponse = await AtiGemini.askGeneric(prompt);
+			final gcResponse = await AtiGemini.askGeneric(prompt, file);
 			final String text = gcResponse?.text ?? "{}";
 			response = AtiResponse.fromJson(jsonDecode(text));
 		} catch(e){
@@ -260,6 +284,7 @@ class Data extends ChangeNotifier {
 		_messages.clear();
 		_tasks.clear();
 		_themeMode = ThemeMode.dark;
+		_files.clear();
 		notifyListeners();
 	}
 }
@@ -274,8 +299,9 @@ class ChatMessage {
 	final bool? suggestion;
 	final bool? blockSuggest;
 	final bool? error;
+	final File? fileRef;
 
-	ChatMessage({this.data, required this.role, required this.timeStamp, this.tail, this.arama, this.gorevRef, this.suggestion, this.blockSuggest, this.error});
+	ChatMessage({this.data, required this.role, required this.timeStamp, this.tail, this.arama, this.gorevRef, this.suggestion, this.blockSuggest, this.error, this.fileRef});
 
   ChatMessage.fromJson(Map<String, dynamic> json)
       : data = json["data"] ?? '',
@@ -286,7 +312,8 @@ class ChatMessage {
 				gorevRef = json["gorevRef"] != null ? Task.fromJson(json["gorevRef"]) : null,
 				suggestion = json["suggestion"] ?? false,
 				blockSuggest = json["blockSuggest"] ?? false,
-				error = json["error"] ?? false;
+				error = json["error"] ?? false,
+				fileRef = json["fileRef"] != null ? File(json["fileRef"]) : null;
 
   Map<String, dynamic> toJson() => {
         "data": data,
@@ -298,6 +325,7 @@ class ChatMessage {
 				"suggestion": suggestion ?? false,
 				"blockSuggest": blockSuggest ?? false,
 				"error": error ?? false,
+				"fileRef": fileRef?.path,
       };
 }
 

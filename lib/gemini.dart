@@ -1,10 +1,12 @@
 import 'dart:convert';
+import 'dart:io';
 
 import 'package:ati/data.dart';
 import 'package:ati/main.dart';
 import 'package:ati/tasks.dart';
 import 'package:flutter/material.dart';
 import 'package:google_generative_ai/google_generative_ai.dart';
+import 'package:mime/mime.dart';
 import 'package:toastification/toastification.dart';
 
 const kSuggestQuestionCount = 3;
@@ -48,7 +50,7 @@ const String atiSafetyPrompt =
 			'- Nasıl hissettiğini sorarlarsa iyi olduğunu söyle ve valid\'i false olarak işaretle\n';
 
 class AtiGemini {
-	static Future<GenerateContentResponse?> askGeneric(String prompt) async {
+	static Future<GenerateContentResponse?> askGeneric(String prompt, File? file) async {
 		var geminiKey = prefs.getString("geminiKey");
 		if (geminiKey == null ) {
 			toastification.show(
@@ -137,7 +139,10 @@ class AtiGemini {
 		);
 
 		final chat = model.startChat(
-			history: data.messages
+			history: 
+			file != null ?
+			[] :
+			data.messages
 			.map<Content>(
 				(m){
 					if (m.gorevRef != null) {
@@ -154,7 +159,11 @@ class AtiGemini {
 				}
 			).toList()
 		);
-		final content = Content.text(prompt);
+		final content = Content.multi([TextPart(prompt)]);
+
+		if(file != null) {
+			content.parts.add(DataPart(lookupMimeType(file.path)!, await file.readAsBytes()));
+		}
 		
 		return chat.sendMessage(content);
 	}
