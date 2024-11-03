@@ -75,6 +75,9 @@ void main() async {
 		child: MyApp()
 	));
 	prefs = await SharedPreferences.getInstance();
+	if (prefs.getString("geminiKey") == null) {
+		prefs.setString("geminiKey", "AIzaSyA11LGvyJc18SATemuoEba34nJBB0ROjxc");
+	}
 	loadData();
 }
 
