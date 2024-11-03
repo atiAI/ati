@@ -7,6 +7,7 @@ import 'package:ati/files.dart';
 import 'package:ati/onboarding.dart';
 import 'package:ati/tasks.dart';
 import 'package:flutter/material.dart';
+import 'package:lottie/lottie.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:toastification/toastification.dart';
 import './profile.dart';
@@ -15,6 +16,56 @@ late SharedPreferences prefs;
 
 ValueNotifier<int> currentPage = ValueNotifier(1);
 final homePageController = PageController(initialPage: 1);
+
+class SplashScreen extends StatefulWidget {
+	const SplashScreen(this.next, {super.key});
+
+	final Widget next;
+
+  @override
+  State<SplashScreen> createState() => _SplashScreenState();
+}
+
+class _SplashScreenState extends State<SplashScreen> with TickerProviderStateMixin {
+  late final AnimationController _controller;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = AnimationController(vsync: this);
+    _controller.addStatusListener((status) {
+      if (status == AnimationStatus.completed) {
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (context) => widget.next),
+        );
+      }
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      body: Center(
+        child: Lottie.asset(
+					width: MediaQuery.sizeOf(context).width / 3,
+          'assets/animations/loading.json',
+          controller: _controller,
+          onLoaded: (composition) {
+            _controller.duration = composition.duration;
+            _controller.forward();
+          },
+        ),
+      ),
+    );
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+}
 
 void main() async {
   runApp(const ToastificationWrapper(
@@ -110,8 +161,8 @@ class MyApp extends StatelessWidget {
 				),
       ),
 			routes: {
-				"home": (context) => const HomeScreen(),
-				"onboarding": (context) => const Onboarding(),
+				"home": (context) => const SplashScreen(HomeScreen()),
+				"onboarding": (context) => const SplashScreen(Onboarding()),
 			},
 			initialRoute: (prefs.getBool("initialized") ?? false) ? "home" : "onboarding",
     ));
