@@ -353,11 +353,17 @@ class HomeGreet extends StatelessWidget {
 							const SizedBox(height: 16),
 							SizedBox(
 								width: min(350, MediaQuery.sizeOf(context).width * 0.95),
-								child: SearchBox(
-									onSubmitted: (s){
-										data.sendMessage(s, null);
-										changePage(0);
-									},
+								child: 
+								ListenableBuilder(
+									listenable: canSend,
+									builder: (context, _) =>
+										SearchBox(
+											onSubmitted: canSend.value ?
+											(s){
+												data.sendMessage(s, null);
+												changePage(0);
+											} : null,
+										)
 								)
 							),
 							const SizedBox(height: 32),
@@ -383,7 +389,7 @@ class HomeGreet extends StatelessWidget {
 class SearchBox extends StatefulWidget {
   const SearchBox({required this.onSubmitted, this.controller, super.key});
 
-	final void Function(String) onSubmitted;
+	final void Function(String)? onSubmitted;
 	final TextEditingController? controller;
 
   @override
@@ -404,7 +410,7 @@ class _SearchBoxState extends State<SearchBox> {
 	onSubmitted(String s) {
 		if (controller.text.trim().isNotEmpty){
 			controller.clear();
-			widget.onSubmitted(s.trim());
+			widget.onSubmitted!(s.trim());
 		}
 	}
 
@@ -455,7 +461,7 @@ class _SearchBoxState extends State<SearchBox> {
 							icon: const Icon(Icons.chevron_right)
 						)
 					),
-					onSubmitted: onSubmitted,
+					onSubmitted: widget.onSubmitted != null ? onSubmitted : null,
 					controller: controller,
 				))
 				]),

@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:io';
 import 'dart:math';
 
+import 'package:ati/chat.dart';
 import 'package:ati/gemini.dart';
 import 'package:ati/main.dart';
 import 'package:ati/tasks.dart';
@@ -103,6 +104,8 @@ class Data extends ChangeNotifier {
 			return;
 		}
 
+		canSend.value = false;
+
 		messages.add(ChatMessage(
 			data: prompt,
 			role: ChatRole.user,
@@ -137,6 +140,7 @@ class Data extends ChangeNotifier {
 				timeStamp: DateTime.now()
 			));
 			notifyListeners();
+			canSend.value = true;
 			return;
 		}
 
@@ -192,14 +196,16 @@ class Data extends ChangeNotifier {
 		}
 
 		messages.last.tail = true;
-
 		notifyListeners();
 
 		saveData();
 
+		canSend.value = true;
 	}
 
 	Future taskHelp(Task task, String? prompt) async {
+		canSend.value = false;
+
 		messages.add(ChatMessage(
 			role: ChatRole.user,
 			timeStamp: DateTime.now(),
@@ -236,9 +242,13 @@ class Data extends ChangeNotifier {
 
 		notifyListeners();
 		saveData();
+
+		canSend.value = true;
 	}
 
 	Future generateQuestions(String initial) async {
+		canSend.value = false;
+
 		messages.add(ChatMessage(
 			role: ChatRole.user,
 			timeStamp: DateTime.now(),
@@ -271,6 +281,7 @@ class Data extends ChangeNotifier {
 		));
 
 		notifyListeners();
+		canSend.value = true;
 	}
 
   void addTask(Task task) {

@@ -11,6 +11,8 @@ import 'package:flutter/scheduler.dart';
 import 'package:shimmer/shimmer.dart';
 import 'package:url_launcher/url_launcher.dart';
 
+ValueNotifier<bool> canSend = ValueNotifier(true);
+
 BoxConstraints getMessageConstraints(BuildContext context) =>
 	BoxConstraints(maxWidth: min(700, MediaQuery.of(context).size.width * 0.8));
 
@@ -98,12 +100,18 @@ class ChatMessageWidget extends StatelessWidget {
 				Container() :
 				Align(
 				alignment: Alignment.centerRight,
-				child: ElevatedButton.icon(
-					onPressed: (){
+				child: ListenableBuilder(
+				listenable: canSend,
+				builder: (context, _) =>
+				ElevatedButton.icon(
+					onPressed: 
+					canSend.value ?
+					(){
 						data.generateQuestions(message.data!);
-					},
+					} : null,
 					label: const Text("Soruyu geliştir"),
 					icon: const Icon(Icons.menu),
+				)
 				)
 				)
 				]);
@@ -152,16 +160,23 @@ class ChatMessageWidget extends StatelessWidget {
 										constraints: getMessageConstraints(context),
 										child: Padding(
 											padding: const EdgeInsets.all(8),
-											child: ElevatedButton(
-												onPressed: (){data.sendMessage(soru, null);},
-												style: ElevatedButton.styleFrom(
-													backgroundColor: Theme.of(context).colorScheme.tertiary,
-													foregroundColor: Theme.of(context).colorScheme.onTertiary
-												),
-												child: Padding(
-													padding: const EdgeInsets.all(8),
-													child: Text(soru)
-												),
+											child: ListenableBuilder(
+												listenable: canSend,
+												builder: (context, _) =>
+													ElevatedButton( 
+														onPressed: 
+														canSend.value ?
+														(){data.sendMessage(soru, null);} :
+														null,
+														style: ElevatedButton.styleFrom(
+															backgroundColor: Theme.of(context).colorScheme.tertiary,
+															foregroundColor: Theme.of(context).colorScheme.onTertiary
+														),
+														child: Padding(
+															padding: const EdgeInsets.all(8),
+															child: Text(soru)
+														),
+													)
 											)
 										)
 									)
@@ -324,15 +339,18 @@ class _ChatPageState extends State<ChatPage> with AutomaticKeepAliveClientMixin{
 										)
 									)
 								),
-								SearchBox(
-									onSubmitted: (prompt){
-										setState(() {
-											data.sendMessage(prompt, selectedFile.value);
-											sbController.clear();
-											selectedFile.value = null;
-										});
-									},
-									controller: sbController
+								ListenableBuilder(listenable: canSend, builder: (context, _) =>
+									SearchBox(
+										onSubmitted: canSend.value ?
+										(prompt){
+											setState(() {
+												data.sendMessage(prompt, selectedFile.value);
+												sbController.clear();
+												selectedFile.value = null;
+											});
+										} : null,
+										controller: sbController
+									)
 								)
 							]
 						)
