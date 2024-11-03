@@ -144,11 +144,11 @@ class _HomeScreenState extends State<HomeScreen> {
 							child: Container(
 								color: Colors.black.withOpacity(0.3),
 								height: kToolbarHeight,
-								width: 92,
+								width: 60,
 							),
 						),
 						Padding(
-							padding: const EdgeInsets.all(8),
+							padding: const EdgeInsets.all(12),
 							child: ClipRRect(
 							borderRadius: BorderRadius.circular(32),
 								child: InkWell(
