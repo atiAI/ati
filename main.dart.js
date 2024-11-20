@@ -29928,7 +29928,7 @@ A.au9.prototype={
 $1(a){var s=A.er().b
 if(s==null)s=null
 else{s=s.canvasKitBaseUrl
-if(s==null)s=null}return(s==null?"https://www.gstatic.com/flutter-canvaskit/af0f0d559c8a87d912a20971bbd84afc80a54b0f/":s)+a},
+if(s==null)s=null}return(s==null?"https://www.gstatic.com/flutter-canvaskit/397deba30fcb592f17dfb31b4e9e31e17fbfae9a/":s)+a},
 $S:67}
 A.a1_.prototype={
 d5(){B.c.ad(this.a.a.save())},
